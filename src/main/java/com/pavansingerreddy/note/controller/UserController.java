@@ -1,5 +1,6 @@
 package com.pavansingerreddy.note.controller;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +44,13 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUserInformationByEmail(userEmail,updateUserModel));
     }
     
+    @DeleteMapping("/{userEmail}")
+    public ResponseEntity<UserDto> deleteUserByEmail(@PathVariable("userEmail") String userEmail) throws UserNotFoundException{
 
+        System.out.println("came here 1");
+
+        return ResponseEntity.ok(userService.deleteUserByEmail(userEmail));
+
+    }
 
 }
