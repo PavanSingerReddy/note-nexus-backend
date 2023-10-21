@@ -23,10 +23,20 @@ public class UserServiceImplementation implements UserService {
     public UserDto createUser(UserModel userModel) {
 
         User user = new User();
-        UserDto userDto = new UserDto();
         BeanUtils.copyProperties(userModel, user);
-
+        
         userRepository.save(user);
+        
+        UserDto userDto = new UserDto();
+        BeanUtils.copyProperties(user, userDto);
+
+        return userDto;
+    }
+
+    @Override
+    public UserDto getUserDetailsByEmail(String userEmail) {
+        User user = userRepository.findByEmail(userEmail);
+        UserDto userDto = new UserDto();
 
         BeanUtils.copyProperties(user, userDto);
 

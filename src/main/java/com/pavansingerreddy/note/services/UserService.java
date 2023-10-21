@@ -8,5 +8,7 @@ import com.pavansingerreddy.note.model.UserModel;
 public interface UserService {
 
     UserDto createUser(UserModel userModel);
+
+    UserDto getUserDetailsByEmail(String userEmail);
     
 }
