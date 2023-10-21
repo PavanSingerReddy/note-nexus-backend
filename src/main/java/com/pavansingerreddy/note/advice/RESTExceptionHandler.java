@@ -5,10 +5,13 @@ import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.pavansingerreddy.note.exception.UserNotFoundException;
 
 @RestControllerAdvice
 public class RESTExceptionHandler {
@@ -54,6 +57,27 @@ public class RESTExceptionHandler {
         return errorMap;
 
 
+    }
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(UserNotFoundException.class)
+    public Map<String,String> handleUserNotFoundException(UserNotFoundException exception){
+        Map<String,String> errorMap = new HashMap<>();
+
+        errorMap.put("errorMessage", exception.getMessage());
+
+        return errorMap;
+    }
+
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
+    public Map<String,String> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException exception){
+        Map<String,String> errorMap = new HashMap<>();
+
+        errorMap.put("errorMessage", exception.getMessage());
+
+        return errorMap;
     }
 
 }

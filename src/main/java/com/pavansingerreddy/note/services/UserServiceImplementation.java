@@ -1,12 +1,14 @@
 package com.pavansingerreddy.note.services;
 
+import java.util.Optional;
+
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.pavansingerreddy.note.dto.UserDto;
 import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.exception.UserNotFoundException;
+import com.pavansingerreddy.note.model.UpdateUserModel;
 import com.pavansingerreddy.note.model.UserModel;
 import com.pavansingerreddy.note.repository.UserRepository;
 
@@ -34,13 +36,61 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public UserDto getUserDetailsByEmail(String userEmail) {
-        User user = userRepository.findByEmail(userEmail);
-        UserDto userDto = new UserDto();
+    public UserDto getUserDetailsByEmail(String userEmail) throws UserNotFoundException {
+        Optional<User> userOptional = userRepository.findByEmail(userEmail);
 
-        BeanUtils.copyProperties(user, userDto);
+        if(userOptional.isPresent()){
 
-        return userDto;
+            User user = userOptional.get();
+
+            UserDto userDto = new UserDto();
+
+            BeanUtils.copyProperties(user, userDto);
+
+            return userDto;
+        }
+        else{
+            throw new UserNotFoundException("User Does not exists");
+        }
+        
+    }
+
+    @Override
+    public UserDto updateUserInformationByEmail(String userEmail,UpdateUserModel updateUserModel) throws UserNotFoundException {
+       Optional<User> userOptional = userRepository.findByEmail(userEmail);
+
+        if(userOptional.isPresent()){
+
+            User user = userOptional.get();
+
+            System.out.println("the user before is : "+user);
+
+
+            if( updateUserModel.getEmail()!=null && !updateUserModel.getEmail().isEmpty()){
+                user.setEmail(updateUserModel.getEmail());
+            }
+
+            if( updateUserModel.getUsername()!=null && !updateUserModel.getUsername().isEmpty()){
+                user.setUsername(updateUserModel.getUsername());
+            }
+
+            if( updateUserModel.getPassword()!=null && !updateUserModel.getPassword().isEmpty()){
+                user.setPassword(updateUserModel.getPassword());
+            }
+
+
+            userRepository.save(user);
+    
+            UserDto userDto = new UserDto();
+    
+            BeanUtils.copyProperties(user, userDto);
+    
+            return userDto;
+        }
+        else{
+            throw new UserNotFoundException("User Does not exists");
+        }
+
     }
     
 }
