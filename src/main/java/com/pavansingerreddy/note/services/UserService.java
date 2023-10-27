@@ -1,8 +1,10 @@
 package com.pavansingerreddy.note.services;
 
+import java.util.Map;
+
 import com.pavansingerreddy.note.dto.UserDto;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
-import com.pavansingerreddy.note.model.UpdateUserModel;
+import com.pavansingerreddy.note.model.NormalUserModel;
 import com.pavansingerreddy.note.model.UserModel;
 
 public interface UserService {
@@ -11,8 +13,10 @@ public interface UserService {
 
     UserDto getUserDetailsByEmail(String userEmail) throws UserNotFoundException;
 
-    UserDto updateUserInformationByEmail(String userEmail,UpdateUserModel updateUserModel) throws UserNotFoundException;
+    UserDto updateUserInformationByEmail(String userEmail,NormalUserModel normalUserModel) throws UserNotFoundException;
 
     UserDto deleteUserByEmail(String userEmail) throws UserNotFoundException;
+
+    Map<String,String> loginUser(NormalUserModel normalUserModel);
     
 }

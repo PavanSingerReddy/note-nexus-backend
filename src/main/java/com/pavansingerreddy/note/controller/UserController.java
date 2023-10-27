@@ -1,4 +1,6 @@
 package com.pavansingerreddy.note.controller;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,14 +13,15 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pavansingerreddy.note.dto.UserDto;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
-import com.pavansingerreddy.note.model.UpdateUserModel;
+import com.pavansingerreddy.note.model.NormalUserModel;
 import com.pavansingerreddy.note.model.UserModel;
 import com.pavansingerreddy.note.services.UserService;
 
+import jakarta.annotation.security.RolesAllowed;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api")
 public class UserController {
 
     private final UserService userService;
@@ -28,29 +31,33 @@ public class UserController {
     }
 
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserModel userModel ){
         return ResponseEntity.ok(userService.createUser(userModel));
     }
 
+    @PostMapping("/login")
+    public ResponseEntity<Map<String,String>> loginUser(@RequestBody NormalUserModel normalUserModel ){
+        return ResponseEntity.ok(userService.loginUser(normalUserModel));
+    }
+
 
     @GetMapping("/{userEmail}")
+    @RolesAllowed("USER")
     public ResponseEntity<UserDto> getUserDetailsByEmail(@PathVariable("userEmail") String userEmail) throws UserNotFoundException{
         return ResponseEntity.ok(userService.getUserDetailsByEmail(userEmail));
     }
 
     @PutMapping("/{userEmail}")
-    public ResponseEntity<UserDto> updateUserInformationByEmail(@PathVariable("userEmail") String userEmail, @RequestBody UpdateUserModel updateUserModel) throws UserNotFoundException {
-        return ResponseEntity.ok(userService.updateUserInformationByEmail(userEmail,updateUserModel));
+    @RolesAllowed("USER")
+    public ResponseEntity<UserDto> updateUserInformationByEmail(@PathVariable("userEmail") String userEmail, @RequestBody NormalUserModel normalUserModel) throws UserNotFoundException {
+        return ResponseEntity.ok(userService.updateUserInformationByEmail(userEmail,normalUserModel));
     }
     
     @DeleteMapping("/{userEmail}")
+    @RolesAllowed("ADMIN")
     public ResponseEntity<UserDto> deleteUserByEmail(@PathVariable("userEmail") String userEmail) throws UserNotFoundException{
-
-        System.out.println("came here 1");
-
         return ResponseEntity.ok(userService.deleteUserByEmail(userEmail));
-
     }
 
 }

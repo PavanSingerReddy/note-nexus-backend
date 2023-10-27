@@ -7,3 +7,14 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+
+# data related to the public key private key and the expiry time of the jwt in seconds from when the jwt is first issued
+jwt:
+  public:
+    key: classpath:publicKey.pem
+  private:
+    key: classpath:privateKey.pem
+  token:
+    expiry: 
+      seconds: 60

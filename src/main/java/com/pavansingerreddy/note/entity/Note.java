@@ -30,10 +30,11 @@ public class Note {
     private Date updatedAt;
   
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,optional = false)
     @JoinColumn(
         name = "user_id",
-        referencedColumnName = "userId"
+        referencedColumnName = "userId",
+        nullable = false
         )
     private User user;
 
