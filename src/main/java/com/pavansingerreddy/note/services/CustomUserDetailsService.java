@@ -24,9 +24,9 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @jakarta.transaction.Transactional
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         
-       Optional<User> userdetails =  userRepository.findByUsername(username);
+       Optional<User> userdetails =  userRepository.findByEmail(email);
         if(userdetails.isPresent()){
             return userdetails.get();
         }

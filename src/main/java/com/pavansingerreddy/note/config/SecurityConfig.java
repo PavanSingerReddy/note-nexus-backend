@@ -20,7 +20,8 @@ import com.pavansingerreddy.note.authentication_providers.JwtAuthenticationProvi
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity(
-    jsr250Enabled = true // enables the JSR-250 standard java security annotations, like @RolesAllowed
+    jsr250Enabled = true, // enables the JSR-250 standard java security annotations, like @RolesAllowed
+    prePostEnabled = true   // enables the PreAuthorize and PostAuthorize annotations
 )
 public class SecurityConfig {
 
@@ -46,7 +47,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception{
+    public SecurityFilterChain loginAndRegisterSecurityFilterChain(HttpSecurity httpSecurity) throws Exception{
         return httpSecurity
                 .csrf(csrf->csrf.disable())
                 .authorizeHttpRequests(auth->{

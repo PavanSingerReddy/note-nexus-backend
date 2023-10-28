@@ -8,6 +8,14 @@ spring:
       ddl-auto: update
     show-sql: true
 
+# uncomment below logging details so that you can see each step of the debug process while the application is getting executed
+
+# logging:
+#   level:
+#     org:
+#       springframework:
+#         security: DEBUG
+
 
 # data related to the public key private key and the expiry time of the jwt in seconds from when the jwt is first issued
 jwt:

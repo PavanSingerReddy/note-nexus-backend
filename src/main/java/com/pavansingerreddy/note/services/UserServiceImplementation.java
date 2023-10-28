@@ -140,7 +140,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     public Map<String,String> loginUser(NormalUserModel normalUserModel) {
         
-        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(normalUserModel.getUsername(), normalUserModel.getPassword());
+        UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(normalUserModel.getEmail(), normalUserModel.getPassword());
 
         Authentication authentication = authenticationManager.authenticate(usernamePasswordAuthenticationToken);
 
