@@ -5,6 +5,7 @@ import java.util.Map;
 
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
 
 @RestControllerAdvice
-public class RESTExceptionHandler {
+public class GlobalRESTExceptionHandler {
     
 
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
@@ -73,6 +74,27 @@ public class RESTExceptionHandler {
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public Map<String,String> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException exception){
+        Map<String,String> errorMap = new HashMap<>();
+
+        errorMap.put("errorMessage", exception.getMessage());
+
+        return errorMap;
+    }
+
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ExceptionHandler(AccessDeniedException.class)
+    public Map<String,String> handleHttpMediaTypeNotSupportedException(AccessDeniedException exception){
+        Map<String,String> errorMap = new HashMap<>();
+
+        errorMap.put("errorMessage", "You don't have the required permissions to access the resource !!!");
+
+        return errorMap;
+    }
+
+
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ExceptionHandler(Exception.class)
+    public Map<String,String> handleAllException(Exception exception){
         Map<String,String> errorMap = new HashMap<>();
 
         errorMap.put("errorMessage", exception.getMessage());

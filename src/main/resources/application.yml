@@ -25,4 +25,4 @@ jwt:
     key: classpath:privateKey.pem
   token:
     expiry: 
-      seconds: 60
+      seconds: 600
