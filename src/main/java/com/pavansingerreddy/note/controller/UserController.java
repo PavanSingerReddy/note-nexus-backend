@@ -31,7 +31,7 @@ public class UserController {
         this.userService = userService;
     }
 
-
+    // @CrossOrigin(origins = "*")  // allows cors for this method or we can use this for method or for entire controller class
     @PostMapping("/register")
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserModel userModel ){
         return ResponseEntity.ok(userService.createUser(userModel));
