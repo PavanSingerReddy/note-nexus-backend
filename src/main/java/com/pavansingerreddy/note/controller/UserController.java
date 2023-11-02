@@ -1,6 +1,10 @@
 package com.pavansingerreddy.note.controller;
 import java.util.Map;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,18 +23,27 @@ import com.pavansingerreddy.note.model.UserModel;
 import com.pavansingerreddy.note.services.UserService;
 
 import jakarta.annotation.security.RolesAllowed;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api")
 public class UserController {
-
+    
     private final UserService userService;
-
+    
+    @Value("${jwt.token.expiry.seconds}")
+    private Long JWTExpireTimeInSeconds;
+    
     UserController(UserService userService) {
         this.userService = userService;
     }
 
+    @PostMapping("/csrf-token")
+    public ResponseEntity<String> getCsrf(){
+        return ResponseEntity.ok("Initial CSRF Token Request Is Successfull !!!");
+    }
+    
     // @CrossOrigin(origins = "*")  // allows cors for this method or we can use this for method or for entire controller class
     @PostMapping("/register")
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserModel userModel ){
@@ -38,8 +51,20 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String,String>> loginUser(@RequestBody NormalUserModel normalUserModel ){
-        return ResponseEntity.ok(userService.loginUser(normalUserModel));
+    public ResponseEntity<?> loginUser(@RequestBody NormalUserModel normalUserModel,HttpServletResponse response ){
+        Map<String,String> jwtToken = userService.loginUser(normalUserModel);
+
+        ResponseCookie cookie = ResponseCookie.from("JWT", jwtToken.get("jwt"))
+        .httpOnly(true)
+        .secure(true)
+        .sameSite("strict")  // Set SameSite to None
+        .path("/")
+        .maxAge(JWTExpireTimeInSeconds)
+        .build();
+        
+        response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 

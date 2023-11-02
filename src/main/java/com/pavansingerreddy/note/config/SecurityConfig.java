@@ -16,12 +16,17 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.pavansingerreddy.note.authentication_filter.JWTTokenFilter;
 import com.pavansingerreddy.note.authentication_providers.JwtAuthenticationProvider;
+import com.pavansingerreddy.note.csrf.CsrfCookieFilter;
+import com.pavansingerreddy.note.csrf.SPACsrfTokenRequestHandler;
 
 @Configuration
 @EnableWebSecurity
@@ -55,10 +60,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain loginAndRegisterSecurityFilterChain(HttpSecurity httpSecurity) throws Exception{
         return httpSecurity
-                .csrf(csrf->csrf.disable())
+                // .csrf(csrf->csrf.disable())
+                // .csrf(Customizer.withDefaults())
+                .csrf((csrf) -> csrf
+				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())   
+				.csrfTokenRequestHandler(new SPACsrfTokenRequestHandler())   
+                .ignoringRequestMatchers("/api/csrf-token/**")         
+			)
+			.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(auth->{
                     auth.requestMatchers("/api/login/**").permitAll();
                     auth.requestMatchers("/api/register/**").permitAll();
+                    auth.requestMatchers("/api/csrf-token/**").permitAll();
+
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -67,7 +81,18 @@ public class SecurityConfig {
                     exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint);
                     exceptionHandling.accessDeniedHandler(customAccessDeniedHandler);
                 })
-                .cors(Customizer.withDefaults())
+                .logout((logout) -> logout
+				// .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
+                .logoutUrl("/api/logout")
+                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                .deleteCookies("JWT")
+                )
+                .headers((headers)->{
+                    headers.xssProtection(Customizer.withDefaults());
+                    headers.contentSecurityPolicy(csp->csp.policyDirectives("script-src 'self'"));
+                })
+                // .cors(Customizer.withDefaults())
+                .cors((cors)->cors.configurationSource(corsConfigurationSource()))
                 .build();
     }
 
@@ -76,11 +101,13 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // configuration.setAllowedOrigin(Arrays.asList("*"));
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type","X-XSRF-TOKEN"));
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/api/register/**", configuration);
         source.registerCorsConfiguration("/api/login/**", configuration);
+        source.registerCorsConfiguration("/api/**", configuration);
         return source;
     }
 
