@@ -65,14 +65,13 @@ public class SecurityConfig {
                 .csrf((csrf) -> csrf
 				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())   
 				.csrfTokenRequestHandler(new SPACsrfTokenRequestHandler())   
-                .ignoringRequestMatchers("/api/csrf-token/**")         
+                // .ignoringRequestMatchers("/api/user/csrf-token/**")         
 			)
 			.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(auth->{
-                    auth.requestMatchers("/api/login/**").permitAll();
-                    auth.requestMatchers("/api/register/**").permitAll();
-                    auth.requestMatchers("/api/csrf-token/**").permitAll();
-
+                    auth.requestMatchers("/api/user/login/**").permitAll();
+                    auth.requestMatchers("/api/user/register/**").permitAll();
+                    auth.requestMatchers("/api/user/csrf-token/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -83,7 +82,7 @@ public class SecurityConfig {
                 })
                 .logout((logout) -> logout
 				// .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
-                .logoutUrl("/api/logout")
+                .logoutUrl("/api/user/logout")
                 .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
                 .deleteCookies("JWT")
                 )
@@ -105,9 +104,10 @@ public class SecurityConfig {
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type","X-XSRF-TOKEN"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/register/**", configuration);
-        source.registerCorsConfiguration("/api/login/**", configuration);
-        source.registerCorsConfiguration("/api/**", configuration);
+        source.registerCorsConfiguration("/api/user/register/**", configuration);
+        source.registerCorsConfiguration("/api/user/login/**", configuration);
+        source.registerCorsConfiguration("/api/user/**", configuration);
+        source.registerCorsConfiguration("/api/notes/**", configuration);
         return source;
     }
 

@@ -1,4 +1,5 @@
 package com.pavansingerreddy.note.controller;
+import java.security.Principal;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -6,10 +7,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,7 +26,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user")
 public class UserController {
     
     private final UserService userService;
@@ -39,7 +38,16 @@ public class UserController {
         this.userService = userService;
     }
 
-    @PostMapping("/csrf-token")
+
+    @GetMapping("/is-authenticated")
+    public ResponseEntity<?> checkAuthentication(Principal principal){
+        if(principal!= null && principal.getName() != null){
+            return ResponseEntity.ok(true); 
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(false);
+    }
+
+    @GetMapping("/csrf-token")
     public ResponseEntity<String> getCsrf(){
         return ResponseEntity.ok("Initial CSRF Token Request Is Successfull !!!");
     }
@@ -68,24 +76,24 @@ public class UserController {
     }
 
 
-    @GetMapping("/{userEmail}")
+    @GetMapping("/get")
     @RolesAllowed("USER")
-    @PreAuthorize("#userEmail == authentication.principal") // "authentication.principal" contains the email id of the user who has logged in see below note for more information on this and "#userEmail" field contains the value of the path variable "String userEmail"
-    public ResponseEntity<UserDto> getUserDetailsByEmail(@PathVariable("userEmail") String userEmail) throws UserNotFoundException{
+    public ResponseEntity<UserDto> getUserDetailsByEmail(Principal principal) throws UserNotFoundException{
+        String userEmail = principal.getName();
         return ResponseEntity.ok(userService.getUserDetailsByEmail(userEmail));
     }
 
-    @PutMapping("/{userEmail}")
+    @PutMapping("/edit")
     @RolesAllowed("USER")
-    @PreAuthorize("#userEmail == authentication.principal") 
-    public ResponseEntity<UserDto> updateUserInformationByEmail(@PathVariable("userEmail") String userEmail, @RequestBody NormalUserModel normalUserModel) throws UserNotFoundException {
+    public ResponseEntity<UserDto> updateUserInformationByEmail(Principal principal, @RequestBody NormalUserModel normalUserModel) throws UserNotFoundException {
+        String userEmail = principal.getName();
         return ResponseEntity.ok(userService.updateUserInformationByEmail(userEmail,normalUserModel));
     }
     
-    @DeleteMapping("/{userEmail}")
+    @DeleteMapping("/delete")
     @RolesAllowed("ADMIN")      // change this role to USER if you want to access the functionality of deleting the user
-    @PreAuthorize("#userEmail == authentication.principal")
-    public ResponseEntity<UserDto> deleteUserByEmail(@PathVariable("userEmail") String userEmail) throws UserNotFoundException{
+    public ResponseEntity<UserDto> deleteUserByEmail(Principal principal) throws UserNotFoundException{
+        String userEmail = principal.getName();
         return ResponseEntity.ok(userService.deleteUserByEmail(userEmail));
     }
 
