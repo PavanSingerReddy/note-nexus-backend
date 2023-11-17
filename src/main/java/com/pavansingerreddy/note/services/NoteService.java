@@ -3,6 +3,7 @@ package com.pavansingerreddy.note.services;
 import java.util.List;
 
 import com.pavansingerreddy.note.dto.NoteDto;
+import com.pavansingerreddy.note.dto.PagableNoteDto;
 import com.pavansingerreddy.note.exception.NoteDoesNotExistsException;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
 import com.pavansingerreddy.note.model.NoteModel;
@@ -20,6 +21,8 @@ public interface NoteService {
     NoteDto deleteASpecificNote(String userEmail, Long noteId) throws NoteDoesNotExistsException;
 
     List<NoteDto> searchNotes(String userEmail, String searchTerm) throws NoteDoesNotExistsException;
+
+    List<PagableNoteDto> getPagedNotes(String userEmail, int page, int size) throws NoteDoesNotExistsException;
 
     
 }

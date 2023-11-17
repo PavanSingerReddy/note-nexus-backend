@@ -8,10 +8,15 @@ import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.pavansingerreddy.note.dto.NoteDto;
+import com.pavansingerreddy.note.dto.PagableNoteDto;
 import com.pavansingerreddy.note.entity.Note;
 import com.pavansingerreddy.note.entity.User;
 import com.pavansingerreddy.note.exception.NoteDoesNotExistsException;
@@ -151,6 +156,30 @@ public class NoteServiceImplementation implements NoteService {
         }
 
         throw new NoteDoesNotExistsException("Note does not exists for the user and NoteId you have provided");
+    }
+
+    @Override
+    public List<PagableNoteDto> getPagedNotes(String userEmail, int page, int size) throws NoteDoesNotExistsException {
+
+        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            Long userId = user.getUserId();
+            Pageable pageable = PageRequest.of(page, size, Sort.by("updatedAt").descending());
+            Page<Note> pagedNotes = noteRepository.findByUser_UserId(userId,pageable);
+            List<Note> notes = pagedNotes.getContent();
+            if (notes != null) {
+                long totalPages = pagedNotes.getTotalPages();
+                List<PagableNoteDto> pagableNoteDtos = new ArrayList<>();
+                notes.stream()
+                        .map(note-> DTOConversionUtil.noteToPagableNoteDto(note, totalPages))
+                        .forEach(pagableNoteDtos::add);
+                return pagableNoteDtos;
+            }
+        }
+
+        throw new NoteDoesNotExistsException("Note does not exists for the user and NoteId you have provided");
+
     }
 
 }

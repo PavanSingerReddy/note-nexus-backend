@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.pavansingerreddy.note.dto.NoteDto;
+import com.pavansingerreddy.note.dto.PagableNoteDto;
 import com.pavansingerreddy.note.dto.UserDto;
 import com.pavansingerreddy.note.entity.Note;
 import com.pavansingerreddy.note.entity.User;
@@ -40,6 +41,24 @@ public class DTOConversionUtil {
         }
         noteDto.setUserId(note.getUser().getUserId() != 0L ? note.getUser().getUserId():0L);
         return noteDto;
+    }
+
+    public static PagableNoteDto noteToPagableNoteDto(Note note,long totalPages){
+
+        PagableNoteDto pagableNoteDto = new PagableNoteDto();
+        pagableNoteDto.setNoteId(note.getNoteId() !=0L ? note.getNoteId(): 0L);
+        pagableNoteDto.setTitle(note.getTitle() != null ? note.getTitle():"");
+        pagableNoteDto.setContent(note.getContent() != null ? note.getContent() : "");
+        if (note.getCreatedAt() != null) {
+            pagableNoteDto.setCreatedAt(note.getCreatedAt());
+        }        
+
+        if(note.getUpdatedAt() != null){
+            pagableNoteDto.setUpdatedAt(note.getUpdatedAt());
+        }
+        pagableNoteDto.setUserId(note.getUser().getUserId() != 0L ? note.getUser().getUserId():0L);
+        pagableNoteDto.setTotalPages(totalPages);
+        return pagableNoteDto;
     }
 
     public static Note noteModelToNote(NoteModel noteModel,Note note){
