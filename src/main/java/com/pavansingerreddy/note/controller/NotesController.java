@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pavansingerreddy.note.dto.NoteDto;
@@ -32,19 +33,19 @@ public class NotesController {
 
     @PostMapping("/create")
     @RolesAllowed("USER")
-    public ResponseEntity<NoteDto> createNewNote(Principal principal,@RequestBody @Valid NoteModel noteModel) throws UserNotFoundException{
+    public ResponseEntity<NoteDto> createNewNote(Principal principal, @RequestBody @Valid NoteModel noteModel)
+            throws UserNotFoundException {
         String userEmail = principal.getName();
-       return ResponseEntity.ok(noteService.createNewNote(noteModel,userEmail));
+        return ResponseEntity.ok(noteService.createNewNote(noteModel, userEmail));
     }
-
 
     @GetMapping("/get/{noteId}")
     @RolesAllowed("USER")
-    public ResponseEntity<NoteDto> getASpecificNote(Principal principal,@PathVariable("noteId") Long noteId) throws NoteDoesNotExistsException{
+    public ResponseEntity<NoteDto> getASpecificNote(Principal principal, @PathVariable("noteId") Long noteId)
+            throws NoteDoesNotExistsException {
         String userEmail = principal.getName();
-        return ResponseEntity.ok(noteService.getASpecificNote(userEmail,noteId));
+        return ResponseEntity.ok(noteService.getASpecificNote(userEmail, noteId));
     }
-
 
     @GetMapping("/get")
     @RolesAllowed("USER")
@@ -52,18 +53,29 @@ public class NotesController {
         String userEmail = principal.getName();
         return ResponseEntity.ok(noteService.getAllNotes(userEmail));
     }
-    
+
     @PutMapping("/edit/{noteId}")
     @RolesAllowed("USER")
-    public ResponseEntity<NoteDto> updateSpecificNote(Principal principal,@PathVariable("noteId") Long noteId,@RequestBody NoteModel noteModel) throws NoteDoesNotExistsException {
+    public ResponseEntity<NoteDto> updateSpecificNote(Principal principal, @PathVariable("noteId") Long noteId,
+            @RequestBody NoteModel noteModel) throws NoteDoesNotExistsException {
         String userEmail = principal.getName();
-        return ResponseEntity.ok(noteService.updateSpecificNote(userEmail,noteId,noteModel));
+        return ResponseEntity.ok(noteService.updateSpecificNote(userEmail, noteId, noteModel));
     }
 
     @DeleteMapping("/delete/{noteId}")
     @RolesAllowed("USER")
-    public ResponseEntity<NoteDto> deleteASpecificNote(Principal principal,@PathVariable("noteId") Long noteId) throws NoteDoesNotExistsException {
+    public ResponseEntity<NoteDto> deleteASpecificNote(Principal principal, @PathVariable("noteId") Long noteId)
+            throws NoteDoesNotExistsException {
         String userEmail = principal.getName();
-        return ResponseEntity.ok(noteService.deleteASpecificNote(userEmail,noteId));
+        return ResponseEntity.ok(noteService.deleteASpecificNote(userEmail, noteId));
+    }
+
+    @GetMapping("/search")
+    @RolesAllowed("USER")
+    public ResponseEntity<List<NoteDto>> getNotes(Principal principal,@RequestParam(name = "term") String searchTerm) throws NoteDoesNotExistsException {
+
+        String userEmail = principal.getName();
+        return ResponseEntity.ok(noteService.searchNotes(userEmail,searchTerm));
+
     }
 }

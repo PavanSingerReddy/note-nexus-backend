@@ -9,6 +9,7 @@ import java.util.Optional;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.pavansingerreddy.note.dto.NoteDto;
 import com.pavansingerreddy.note.entity.Note;
@@ -21,6 +22,7 @@ import com.pavansingerreddy.note.repository.UserRepository;
 import com.pavansingerreddy.note.utils.DTOConversionUtil;
 
 @Service
+@Transactional
 public class NoteServiceImplementation implements NoteService {
 
     @Autowired
@@ -30,16 +32,16 @@ public class NoteServiceImplementation implements NoteService {
     UserRepository userRepository;
 
     @Override
-    public NoteDto createNewNote(NoteModel noteModel,String userEmail) throws UserNotFoundException {
+    public NoteDto createNewNote(NoteModel noteModel, String userEmail) throws UserNotFoundException {
 
         Note note = new Note();
         BeanUtils.copyProperties(noteModel, note);
         note.setCreatedAt(Date.from(Instant.now()));
         note.setUpdatedAt(Date.from(Instant.now()));
 
-        Optional<User> user= userRepository.findByEmail(userEmail);
-        
-        if(user.isPresent()){
+        Optional<User> user = userRepository.findByEmail(userEmail);
+
+        if (user.isPresent()) {
             note.setUser(user.get());
             noteRepository.save(note);
             return DTOConversionUtil.noteToNoteDTO(note);
@@ -54,12 +56,12 @@ public class NoteServiceImplementation implements NoteService {
         Optional<Note> optionalNote = noteRepository.findById(noteId);
         Optional<User> optionalUser = userRepository.findByEmail(userEmail);
 
-        if(optionalNote.isPresent() && optionalUser.isPresent()){
+        if (optionalNote.isPresent() && optionalUser.isPresent()) {
 
             Note note = optionalNote.get();
             User user = optionalUser.get();
-            if(note.getUser().getUserId() == user.getUserId()){
-               return DTOConversionUtil.noteToNoteDTO(note);
+            if (note.getUser().getUserId() == user.getUserId()) {
+                return DTOConversionUtil.noteToNoteDTO(note);
             }
         }
 
@@ -71,15 +73,15 @@ public class NoteServiceImplementation implements NoteService {
     public List<NoteDto> getAllNotes(String userEmail) throws NoteDoesNotExistsException {
 
         Optional<User> optionalUser = userRepository.findByEmail(userEmail);
-        if(optionalUser.isPresent()){
+        if (optionalUser.isPresent()) {
             User user = optionalUser.get();
             List<Note> notes = user.getNotes();
-            if(notes !=null){
+            if (notes != null) {
                 List<NoteDto> noteDtos = new ArrayList<>();
                 notes.stream()
-                    .map(DTOConversionUtil::noteToNoteDTO)
-                    .forEach(noteDtos::add);
-                
+                        .map(DTOConversionUtil::noteToNoteDTO)
+                        .forEach(noteDtos::add);
+
                 return noteDtos;
             }
         }
@@ -88,19 +90,20 @@ public class NoteServiceImplementation implements NoteService {
     }
 
     @Override
-    public NoteDto updateSpecificNote(String userEmail, Long noteId, NoteModel noteModel) throws NoteDoesNotExistsException {
+    public NoteDto updateSpecificNote(String userEmail, Long noteId, NoteModel noteModel)
+            throws NoteDoesNotExistsException {
 
         Optional<Note> optionalNote = noteRepository.findById(noteId);
         Optional<User> optionalUser = userRepository.findByEmail(userEmail);
 
-        if(optionalNote.isPresent() && optionalUser.isPresent()){
+        if (optionalNote.isPresent() && optionalUser.isPresent()) {
             Note note = optionalNote.get();
             User user = optionalUser.get();
-            if(note.getUser().getUserId() == user.getUserId()){
+            if (note.getUser().getUserId() == user.getUserId()) {
                 note = DTOConversionUtil.noteModelToNote(noteModel, note);
                 note.setUpdatedAt(Date.from(Instant.now()));
                 noteRepository.save(note);
-               return DTOConversionUtil.noteToNoteDTO(note);
+                return DTOConversionUtil.noteToNoteDTO(note);
             }
         }
         throw new NoteDoesNotExistsException("Note does not exists for the user and NoteId you have provided");
@@ -112,19 +115,42 @@ public class NoteServiceImplementation implements NoteService {
         Optional<Note> optionalNote = noteRepository.findById(noteId);
         Optional<User> optionalUser = userRepository.findByEmail(userEmail);
 
-         if(optionalNote.isPresent() && optionalUser.isPresent()){
+        if (optionalNote.isPresent() && optionalUser.isPresent()) {
             Note note = optionalNote.get();
             User user = optionalUser.get();
-            if(note.getUser().getUserId() == user.getUserId()){
+            if (note.getUser().getUserId() == user.getUserId()) {
                 noteRepository.delete(note);
                 return DTOConversionUtil.noteToNoteDTO(note);
             }
-         }
+        }
 
-
-         throw new NoteDoesNotExistsException("Note does not exists for the user and NoteId you have provided");
+        throw new NoteDoesNotExistsException("Note does not exists for the user and NoteId you have provided");
 
     }
 
-    
+    @Override
+    public List<NoteDto> searchNotes(String userEmail, String searchTerm) throws NoteDoesNotExistsException {
+        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        if (optionalUser.isPresent()) {
+            User user = optionalUser.get();
+            Long userId = user.getUserId();
+            // System.out.println("+++++++++++====================++++++++");
+            // System.out.println("user id is :" + userId);
+            // System.out.println("search term is : "+searchTerm);
+            // System.out.println("Email id is : "+userEmail);
+            // System.out.println("+++++++++++====================++++++++");
+            List<Note> notes = noteRepository.search(userId, searchTerm);
+            if (notes != null) {
+                List<NoteDto> noteDtos = new ArrayList<>();
+                notes.stream()
+                        .map(DTOConversionUtil::noteToNoteDTO)
+                        .forEach(noteDtos::add);
+
+                return noteDtos;
+            }
+        }
+
+        throw new NoteDoesNotExistsException("Note does not exists for the user and NoteId you have provided");
+    }
+
 }

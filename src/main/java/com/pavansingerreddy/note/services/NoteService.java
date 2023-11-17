@@ -19,5 +19,7 @@ public interface NoteService {
 
     NoteDto deleteASpecificNote(String userEmail, Long noteId) throws NoteDoesNotExistsException;
 
+    List<NoteDto> searchNotes(String userEmail, String searchTerm) throws NoteDoesNotExistsException;
+
     
 }
