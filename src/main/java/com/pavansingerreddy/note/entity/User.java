@@ -25,6 +25,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Entity
 @Getter
@@ -35,6 +36,7 @@ import lombok.Setter;
     generator = ObjectIdGenerators.PropertyGenerator.class,
     property = "userId"
 )
+@ToString
 public class User implements UserDetails {
     
     @Id
@@ -51,6 +53,8 @@ public class User implements UserDetails {
         inverseJoinColumns = @JoinColumn(name = "role_id")
         )
     private Set<Role> roles;
+
+    private boolean enabled = false;
 
      @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Note> notes;
@@ -77,7 +81,7 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return this.enabled;
     }
 
 }

@@ -1,19 +1,27 @@
-{
-    "properties": [
-        {
-            "name": "jwt.private.key",
-            "type": "java.lang.String",
-            "description": "private key for JWT Encryption"
-        },
-        {
-            "name": "jwt.public.key",
-            "type": "java.lang.String",
-            "description": "public key for JWT Encryption"
-        },
-        {
-            "name": "jwt.token.expiry.seconds",
-            "type": "java.lang.Integer",
-            "description": "Expiration time of the jwt in seconds after the login"
-        }
-    ]
-}
+{"properties": [
+  {
+    "name": "jwt.private.key",
+    "type": "java.lang.String",
+    "description": "private key for JWT Encryption"
+  },
+  {
+    "name": "jwt.public.key",
+    "type": "java.lang.String",
+    "description": "public key for JWT Encryption"
+  },
+  {
+    "name": "jwt.token.expiry.seconds",
+    "type": "java.lang.Integer",
+    "description": "Expiration time of the jwt in seconds after the login"
+  },
+  {
+    "name": "verification.Token.expiry.seconds",
+    "type": "java.lang.Integer",
+    "description": "Expiration time of the verification token in seconds after the registration"
+  },
+  {
+    "name": "applicationUrl.user.api",
+    "type": "java.lang.String",
+    "description": "User api url"
+  }
+]}

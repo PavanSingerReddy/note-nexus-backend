@@ -120,7 +120,7 @@ public class GlobalRESTExceptionHandler {
     // required roles or permissions
     @ExceptionHandler(AccessDeniedException.class)
     // function which handles the AccessDeniedException
-    public Map<String, String> handleHttpMediaTypeNotSupportedException(AccessDeniedException exception) {
+    public Map<String, String> handleAccessDeniedException(AccessDeniedException exception) {
         Map<String, String> errorMap = new HashMap<>();
 
         errorMap.put("errorMessage", "You don't have the required permissions to access the resource !!!");

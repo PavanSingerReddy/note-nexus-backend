@@ -7,6 +7,17 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
+  mail:
+    host:   #enter your smtp server like smtp-mail.outlook.com for outlook etc...
+    port: 587
+    username:   #enter your email id of the email account which is assosiated with the above smtp server
+    password:   #enter the app password of your email account
+    properties: 
+      mail: 
+        smtp: 
+          auth: true
+          starttls: 
+            enable: true
 
 # uncomment below logging details so that you can see each step of the debug process while the application is getting executed
 
@@ -17,6 +28,17 @@ spring:
 #         security: DEBUG
 
 
+# our verification token for registering expiry date
+verification:
+  Token:
+    expiry:
+      seconds: 600
+
+
+# user application url is used to send our currently running user api's url it is used to send verification url
+applicationUrl:
+  user:
+    api: http://localhost:8080/api/user
 # data related to the public key private key and the expiry time of the jwt in seconds from when the jwt is first issued
 jwt:
   public:
@@ -25,4 +47,4 @@ jwt:
     key: classpath:privateKey.pem
   token:
     expiry: 
-      seconds: 600
+      seconds: 60000
