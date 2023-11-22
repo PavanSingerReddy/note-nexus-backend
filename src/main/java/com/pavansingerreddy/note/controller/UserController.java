@@ -83,6 +83,15 @@ public class UserController {
         throw new Exception("Bad User Details");
     }
 
+    @GetMapping("/resendVerifyToken")
+    public ResponseEntity<UserDto> resendVerificationToken(@RequestParam("email") String email) throws UserNotFoundException{
+        User user = userService.getUserDetailsByEmail(email);
+        userService.deletePreviousTokenIfExists(user);
+        publisher.publishEvent(new RegistrationCompleteEvent(user, UserApiApplicationUrl));
+        return ResponseEntity.ok(DTOConversionUtil.userToUserDTO(user));
+
+    }
+
     @PostMapping("/login")
     public ResponseEntity<?> loginUser(@RequestBody NormalUserModel normalUserModel, HttpServletResponse response) {
         Map<String, String> jwtToken = userService.loginUser(normalUserModel);
@@ -104,7 +113,8 @@ public class UserController {
     @RolesAllowed("USER")
     public ResponseEntity<UserDto> getUserDetailsByEmail(Principal principal) throws UserNotFoundException {
         String userEmail = principal.getName();
-        return ResponseEntity.ok(userService.getUserDetailsByEmail(userEmail));
+        User user = userService.getUserDetailsByEmail(userEmail);
+        return ResponseEntity.ok(DTOConversionUtil.userToUserDTO(user));
     }
 
     @PutMapping("/edit")

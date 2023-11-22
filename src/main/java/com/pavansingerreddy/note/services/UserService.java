@@ -12,7 +12,7 @@ public interface UserService {
 
     User createUser(UserModel userModel) throws Exception;
 
-    UserDto getUserDetailsByEmail(String userEmail) throws UserNotFoundException;
+    User getUserDetailsByEmail(String userEmail) throws UserNotFoundException;
 
     UserDto updateUserInformationByEmail(String userEmail,NormalUserModel normalUserModel) throws UserNotFoundException;
 
@@ -23,5 +23,7 @@ public interface UserService {
     void saveVerificationTokenForUser(String token, User user);
 
     boolean validateVerificationToken(String token);
+
+    void deletePreviousTokenIfExists(User user);
     
 }

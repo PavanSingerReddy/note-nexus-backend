@@ -81,12 +81,12 @@ public class UserServiceImplementation implements UserService {
     }
 
     @Override
-    public UserDto getUserDetailsByEmail(String userEmail) throws UserNotFoundException {
+    public User getUserDetailsByEmail(String userEmail) throws UserNotFoundException {
         Optional<User> userOptional = userRepository.findByEmail(userEmail);
 
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            return DTOConversionUtil.userToUserDTO(user);
+            return user;
         }
         throw new UserNotFoundException("User Does not exists");
 
@@ -173,6 +173,18 @@ public class UserServiceImplementation implements UserService {
         userRepository.save(user);
         verificationTokenRepository.delete(verificationToken);
         return true;
+
+    }
+
+    @Override
+    public void deletePreviousTokenIfExists(User user) {
+
+
+        Optional <VerificationToken> verificationToken = verificationTokenRepository.findByUser(user);
+
+        if(verificationToken.isPresent()){
+            verificationTokenRepository.delete(verificationToken.get());
+        }
 
     }
 

@@ -28,7 +28,7 @@ spring:
 #         security: DEBUG
 
 
-# our verification token for registering expiry date
+# our verification token expiry date for registering a new user
 verification:
   Token:
     expiry:

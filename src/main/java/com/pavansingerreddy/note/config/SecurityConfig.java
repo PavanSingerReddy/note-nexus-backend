@@ -73,6 +73,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/user/register/**").permitAll();
                     auth.requestMatchers("/api/user/csrf-token/**").permitAll();
                     auth.requestMatchers("/api/user/verifyRegistration/**").permitAll();
+                    auth.requestMatchers("/api/user/resendVerifyToken/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
