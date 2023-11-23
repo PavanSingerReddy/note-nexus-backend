@@ -24,6 +24,7 @@ import com.pavansingerreddy.note.entity.User;
 import com.pavansingerreddy.note.events.event_publisher.PasswordResetEvent;
 import com.pavansingerreddy.note.events.event_publisher.RegistrationCompleteEvent;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
+import com.pavansingerreddy.note.model.ChangePasswordModel;
 import com.pavansingerreddy.note.model.NormalUserModel;
 import com.pavansingerreddy.note.model.PasswordModel;
 import com.pavansingerreddy.note.model.UserModel;
@@ -86,7 +87,8 @@ public class UserController {
     }
 
     @GetMapping("/resendVerifyToken")
-    public ResponseEntity<UserDto> resendVerificationToken(@RequestParam("email") String email) throws UserNotFoundException{
+    public ResponseEntity<UserDto> resendVerificationToken(@RequestParam("email") String email)
+            throws UserNotFoundException {
         User user = userService.getUserDetailsByEmail(email);
         userService.deletePreviousTokenIfExists(user);
         publisher.publishEvent(new RegistrationCompleteEvent(user, UserApiApplicationUrl));
@@ -94,32 +96,77 @@ public class UserController {
 
     }
 
-    // post api endpoint for resetting the forgotten password it send's an email with the link to reset the password
+    // post api endpoint for resetting the forgotten password it send's an email
+    // with the link to reset the password
     @PostMapping("/resetPassword")
-    // The request should contain the email of the user who forgot the password and want to reset the password
-    public ResponseEntity<String> resetPassword(@RequestBody @Valid PasswordModel passwordModel) throws UserNotFoundException,Exception{
-        //userService.getUserDetailsByEmail() returns the user object with their email id
+    // The request should contain the email of the user who forgot the password and
+    // want to reset the password
+    public ResponseEntity<String> resetPassword(@RequestBody @Valid PasswordModel passwordModel)
+            throws UserNotFoundException, Exception {
+        // userService.getUserDetailsByEmail() returns the user object with their email
+        // id
         User user = userService.getUserDetailsByEmail(passwordModel.getEmail());
-        // checking if the user is enabled or not if the user is not enabled then we throw the exception as "User is not verified.Verify the user first"
-        if(!user.isEnabled()){
+        // checking if the user is enabled or not if the user is not enabled then we
+        // throw the exception as "User is not verified.Verify the user first"
+        if (!user.isEnabled()) {
             throw new Exception("User is not verified.Verify the user first");
         }
 
-        // if there exists any previous password reset token for this user we delete it because we cannot set a new password reset token if any old token exists as PasswordResetToken entity is mapped with one to one relationship with the user
+        // if there exists any previous password reset token for this user we delete it
+        // because we cannot set a new password reset token if any old token exists as
+        // PasswordResetToken entity is mapped with one to one relationship with the
+        // user
         userService.deletePreviousPasswordResetTokenIfExists(user);
-        // publishing a PasswordResetEvent with user and application url(url on which user endpoints exists) which triggers the PasswordResetEventListener
+        // publishing a PasswordResetEvent with user and application url(url on which
+        // user endpoints exists) which triggers the PasswordResetEventListener
         publisher.publishEvent(new PasswordResetEvent(user, UserApiApplicationUrl));
-        // returning the string response to the user as "sent url to reset password successfully"
+        // returning the string response to the user as "sent url to reset password
+        // successfully"
         return ResponseEntity.ok("sent url to reset password successfully");
     }
 
     @PostMapping("/verifyResetPassword")
-    // The /verifyResetPassword api endpoint verifies the reset password request which we sent to the user's email with url containing UUID as the token.we are taking token which is sent as a query parameter and the password model as a body of the post request which contains newpassword and retypednewpassword as a json with the request
-    public ResponseEntity<String> verifyResetPassword(@RequestParam("token")String token,@RequestBody PasswordModel passwordModel) throws Exception {
-        // The validatePasswordResetToken checks if the token is valid and not expired and returns the user assosiated with the token
+    // The /verifyResetPassword api endpoint verifies the reset password request
+    // which we sent to the user's email with url containing UUID as the token.we
+    // are taking token which is sent as a query parameter and the password model as
+    // a body of the post request which contains newpassword and retypednewpassword
+    // as a json with the request
+    public ResponseEntity<String> verifyResetPassword(@RequestParam("token") String token,
+            @RequestBody PasswordModel passwordModel) throws Exception {
+        // The validatePasswordResetToken checks if the token is valid and not expired
+        // and returns the user assosiated with the token
         User user = userService.validatePasswordResetToken(token);
-        // it takes the user object and the password model and checks if the new passoword and retyped new password matches if they match then it saves the new password in the database else it throws an exception
-        return ResponseEntity.ok(userService.resetPassword(user,passwordModel));
+        // it takes the user object and the password model and checks if the new
+        // passoword and retyped new password matches if they match then it saves the
+        // new password in the database else it throws an exception
+        return ResponseEntity.ok(userService.resetPassword(user, passwordModel));
+
+    }
+
+    // if the user is already logged in and want to change the password then this
+    // endpoint is called
+    @PostMapping("/changePassword")
+    // The changepassword takes the ChangePasswordModel which takes old password,new
+    // password and retyped new password as its json body and principal object for
+    // detecting the user who is logged in.As principal object contains the email of
+    // the user who sent the request as we pass the jwt when we are sending request
+    // and the jwt contains the user's email
+    public ResponseEntity<String> changePassword(@RequestBody @Valid ChangePasswordModel changePasswordModel,
+            Principal principal) throws UserNotFoundException, Exception {
+
+        // get's the email from the principal.getName() as we are fetching the email
+        // from the jwt using our jwt Token filter and setting the security context
+        // using that email details
+        String email = principal.getName();
+        // get's the user object from the user's email address1
+        User user = userService.getUserDetailsByEmail(email);
+        // userService.changePassword() takes the user object and change password model
+        // as parameters and it compares the old password given by the change password
+        // model and the user's password from the database if they both match then it
+        // verifies if the new password and retyped new password from the change
+        // password model matches if they match then it saves the new password of the
+        // user to the database and returns a string as "Password changed successfully"
+        return ResponseEntity.ok(userService.changePassword(user, changePasswordModel));
 
     }
 
@@ -156,9 +203,10 @@ public class UserController {
         return ResponseEntity.ok(userService.updateUserInformationByEmail(userEmail, normalUserModel));
     }
 
+    // change this role to USER if you want to access the functionality of deleting
+    // the user
+    @RolesAllowed("ADMIN")
     @DeleteMapping("/delete")
-    @RolesAllowed("ADMIN") // change this role to USER if you want to access the functionality of deleting
-                           // the user
     public ResponseEntity<UserDto> deleteUserByEmail(Principal principal) throws UserNotFoundException {
         String userEmail = principal.getName();
         return ResponseEntity.ok(userService.deleteUserByEmail(userEmail));

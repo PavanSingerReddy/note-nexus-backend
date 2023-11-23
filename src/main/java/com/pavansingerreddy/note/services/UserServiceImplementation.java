@@ -23,6 +23,7 @@ import com.pavansingerreddy.note.entity.User;
 import com.pavansingerreddy.note.entity.VerificationToken;
 import com.pavansingerreddy.note.exception.UserAlreadyExistsException;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
+import com.pavansingerreddy.note.model.ChangePasswordModel;
 import com.pavansingerreddy.note.model.NormalUserModel;
 import com.pavansingerreddy.note.model.PasswordModel;
 import com.pavansingerreddy.note.model.UserModel;
@@ -31,6 +32,8 @@ import com.pavansingerreddy.note.repository.UserRepository;
 import com.pavansingerreddy.note.repository.VerificationTokenRepository;
 import com.pavansingerreddy.note.utils.DTOConversionUtil;
 import com.pavansingerreddy.note.utils.JWTUtil;
+
+import jakarta.validation.Valid;
 
 @Service
 public class UserServiceImplementation implements UserService {
@@ -261,6 +264,29 @@ public class UserServiceImplementation implements UserService {
             return "password reset successful";
         }
         throw new Exception("new Password and retyped new password does not match");
+    }
+
+    // this method is used to change the password of the logged in user it takes the user object and the change password model which is given to us by the user and it contains old password , new password and retyped new password
+    @Override
+    public String changePassword(User user, @Valid ChangePasswordModel changePasswordModel) throws Exception {
+
+        // checking if the old password which the user sent and the password in the database match if they doesn't match then we throw an exception
+        if(!passwordEncoder.matches(changePasswordModel.getOldpassword(), user.getPassword())){
+            throw new Exception("old password does not match please verify and try again");
+        }
+
+        // checking if the new password and retyped new password matches if they doesn't match then we throw an exception
+        if(!changePasswordModel.ValidatePasswordAndRetypedPassword()){
+            throw new Exception("new Password and retyped new password does not match");
+        }
+
+        // if all the above conditions satisfy then we save the user to the database by changing his password
+        user.setPassword(passwordEncoder.encode(changePasswordModel.getNewpassword()));
+        userRepository.save(user);
+
+        // if the password saved successfully then we send a string named "Password changed successfully"
+        return "Password changed successfully";
+
     }
 
 }

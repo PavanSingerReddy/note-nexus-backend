@@ -5,9 +5,12 @@ import java.util.Map;
 import com.pavansingerreddy.note.dto.UserDto;
 import com.pavansingerreddy.note.entity.User;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
+import com.pavansingerreddy.note.model.ChangePasswordModel;
 import com.pavansingerreddy.note.model.NormalUserModel;
 import com.pavansingerreddy.note.model.PasswordModel;
 import com.pavansingerreddy.note.model.UserModel;
+
+import jakarta.validation.Valid;
 
 public interface UserService {
 
@@ -34,5 +37,7 @@ public interface UserService {
     User validatePasswordResetToken(String token) throws Exception;
 
     String resetPassword(User user, PasswordModel passwordModel) throws Exception;
+
+    String changePassword(User user, @Valid ChangePasswordModel changePasswordModel) throws Exception;
     
 }
