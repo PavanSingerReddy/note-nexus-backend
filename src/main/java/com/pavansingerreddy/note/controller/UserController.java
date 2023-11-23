@@ -21,9 +21,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.pavansingerreddy.note.dto.UserDto;
 import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.events.event_publisher.PasswordResetEvent;
 import com.pavansingerreddy.note.events.event_publisher.RegistrationCompleteEvent;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
 import com.pavansingerreddy.note.model.NormalUserModel;
+import com.pavansingerreddy.note.model.PasswordModel;
 import com.pavansingerreddy.note.model.UserModel;
 import com.pavansingerreddy.note.services.UserService;
 import com.pavansingerreddy.note.utils.DTOConversionUtil;
@@ -75,10 +77,10 @@ public class UserController {
 
     // api for verifying the registration
     @GetMapping("/verifyRegistration")
-    public String verifyRegistration(@RequestParam("token") String token) throws Exception {
+    public ResponseEntity<String> verifyRegistration(@RequestParam("token") String token) throws Exception {
         boolean result = userService.validateVerificationToken(token);
         if (result) {
-            return "User Verified Successfully";
+            return ResponseEntity.ok("User Verified Successfully");
         }
         throw new Exception("Bad User Details");
     }
@@ -89,6 +91,35 @@ public class UserController {
         userService.deletePreviousTokenIfExists(user);
         publisher.publishEvent(new RegistrationCompleteEvent(user, UserApiApplicationUrl));
         return ResponseEntity.ok(DTOConversionUtil.userToUserDTO(user));
+
+    }
+
+    // post api endpoint for resetting the forgotten password it send's an email with the link to reset the password
+    @PostMapping("/resetPassword")
+    // The request should contain the email of the user who forgot the password and want to reset the password
+    public ResponseEntity<String> resetPassword(@RequestBody @Valid PasswordModel passwordModel) throws UserNotFoundException,Exception{
+        //userService.getUserDetailsByEmail() returns the user object with their email id
+        User user = userService.getUserDetailsByEmail(passwordModel.getEmail());
+        // checking if the user is enabled or not if the user is not enabled then we throw the exception as "User is not verified.Verify the user first"
+        if(!user.isEnabled()){
+            throw new Exception("User is not verified.Verify the user first");
+        }
+
+        // if there exists any previous password reset token for this user we delete it because we cannot set a new password reset token if any old token exists as PasswordResetToken entity is mapped with one to one relationship with the user
+        userService.deletePreviousPasswordResetTokenIfExists(user);
+        // publishing a PasswordResetEvent with user and application url(url on which user endpoints exists) which triggers the PasswordResetEventListener
+        publisher.publishEvent(new PasswordResetEvent(user, UserApiApplicationUrl));
+        // returning the string response to the user as "sent url to reset password successfully"
+        return ResponseEntity.ok("sent url to reset password successfully");
+    }
+
+    @PostMapping("/verifyResetPassword")
+    // The /verifyResetPassword api endpoint verifies the reset password request which we sent to the user's email with url containing UUID as the token.we are taking token which is sent as a query parameter and the password model as a body of the post request which contains newpassword and retypednewpassword as a json with the request
+    public ResponseEntity<String> verifyResetPassword(@RequestParam("token")String token,@RequestBody PasswordModel passwordModel) throws Exception {
+        // The validatePasswordResetToken checks if the token is valid and not expired and returns the user assosiated with the token
+        User user = userService.validatePasswordResetToken(token);
+        // it takes the user object and the password model and checks if the new passoword and retyped new password matches if they match then it saves the new password in the database else it throws an exception
+        return ResponseEntity.ok(userService.resetPassword(user,passwordModel));
 
     }
 
