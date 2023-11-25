@@ -71,8 +71,13 @@ public class UserServiceImplementation implements UserService {
         // user is not already present in the database
         if (userModel.ValidatePasswordAndRetypedPassword()) {
 
-            if (userOptional.isPresent()) {
+            // checking if the user is already present and the user is already enabled then we throw the UserAlreadyExistsException
+            if (userOptional.isPresent() && userOptional.get().isEnabled()) {
                 throw new UserAlreadyExistsException("User already exists in the database");
+            }
+            // else if user already present and is not enabled then we delete the user so that we can create a new user below with the new details.here we are deleting the old user if he is not enabled and creating a new one with new details or else we can also update the existing user with new details but here we deleted the old user and created a new user with new details
+            else if (userOptional.isPresent()&& !userOptional.get().isEnabled()) {
+                userRepository.delete(userOptional.get());
             }
             User user = new User();
             BeanUtils.copyProperties(userModel, user);
