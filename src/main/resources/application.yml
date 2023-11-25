@@ -35,10 +35,11 @@ verification:
       seconds: 600
 
 
-# user application url is used to send our currently running user api's url it is used to send verification url
-applicationUrl:
-  user:
-    api: http://localhost:8080/api/user
+# user's frontend application url . when user goes to this frontend url it is going to call our backend to verify the user
+frontend:
+  applicationUrl:
+    user:
+      api: http://localhost:5000
 # data related to the public key private key and the expiry time of the jwt in seconds from when the jwt is first issued
 jwt:
   public:

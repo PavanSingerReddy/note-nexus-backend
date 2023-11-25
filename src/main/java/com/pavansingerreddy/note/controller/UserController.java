@@ -51,7 +51,7 @@ public class UserController {
     @Value("${jwt.token.expiry.seconds}")
     private Long JWTExpireTimeInSeconds;
 
-    @Value("${applicationUrl.user.api}")
+    @Value("${frontend.applicationUrl.user.api}")
     private String UserApiApplicationUrl;
 
     @GetMapping("/is-authenticated")

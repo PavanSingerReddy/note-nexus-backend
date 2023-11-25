@@ -20,7 +20,7 @@
     "description": "Expiration time of the verification token in seconds after the registration"
   },
   {
-    "name": "applicationUrl.user.api",
+    "name": "frontend.applicationUrl.user.api",
     "type": "java.lang.String",
     "description": "User api url"
   }

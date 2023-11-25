@@ -71,12 +71,17 @@ public class UserServiceImplementation implements UserService {
         // user is not already present in the database
         if (userModel.ValidatePasswordAndRetypedPassword()) {
 
-            // checking if the user is already present and the user is already enabled then we throw the UserAlreadyExistsException
+            // checking if the user is already present and the user is already enabled then
+            // we throw the UserAlreadyExistsException
             if (userOptional.isPresent() && userOptional.get().isEnabled()) {
                 throw new UserAlreadyExistsException("User already exists in the database");
             }
-            // else if user already present and is not enabled then we delete the user so that we can create a new user below with the new details.here we are deleting the old user if he is not enabled and creating a new one with new details or else we can also update the existing user with new details but here we deleted the old user and created a new user with new details
-            else if (userOptional.isPresent()&& !userOptional.get().isEnabled()) {
+            // else if user already present and is not enabled then we delete the user so
+            // that we can create a new user below with the new details.here we are deleting
+            // the old user if he is not enabled and creating a new one with new details or
+            // else we can also update the existing user with new details but here we
+            // deleted the old user and created a new user with new details
+            else if (userOptional.isPresent() && !userOptional.get().isEnabled()) {
                 userRepository.delete(userOptional.get());
             }
             User user = new User();
@@ -179,12 +184,27 @@ public class UserServiceImplementation implements UserService {
         // if the verification token time is less than the current time then the token
         // is expired so we delete the token from the database and return false
         if ((verificationToken.getExpirationTime().getTime() - cal.getTime().getTime()) <= 0) {
+            // as we have bidirectional one to one relationship between user and
+            // verification token we should remove the reference of the verification token
+            // from user object and then delete the verification instead of directly
+            // deleting the verification token because if we directly delete the
+            // verification token as we bidirectional one to one relationship with user the
+            // verification token still exists in the database
+
+            user.setVerificationToken(null);
             verificationTokenRepository.delete(verificationToken);
             return false;
         }
 
         user.setEnabled(true);
         userRepository.save(user);
+        // as we have bidirectional one to one relationship between user and
+        // verification token we should remove the reference of the verification token
+        // from user object and then delete the verification instead of directly
+        // deleting the verification token because if we directly delete the
+        // verification token as we bidirectional one to one relationship with user the
+        // verification token still exists in the database
+        user.setVerificationToken(null);
         verificationTokenRepository.delete(verificationToken);
         return true;
 
@@ -247,7 +267,8 @@ public class UserServiceImplementation implements UserService {
         }
 
         // if the passwordResetToken token time is less than the current time then the
-        // token is expired so we delete the token from the database and throw an exception
+        // token is expired so we delete the token from the database and throw an
+        // exception
         if ((passwordResetToken.getExpirationTime().getTime() - cal.getTime().getTime()) <= 0) {
             passwordResetTokenRepository.delete(passwordResetToken);
             throw new Exception("Password Reset Token is expired request a new one");
@@ -258,11 +279,13 @@ public class UserServiceImplementation implements UserService {
         return user;
     }
 
-
-    // taking the user object and the password model which contains the newpassword and validatePasswordResetToken and resetting the user's password.
+    // taking the user object and the password model which contains the newpassword
+    // and validatePasswordResetToken and resetting the user's password.
     @Override
     public String resetPassword(User user, PasswordModel passwordModel) throws Exception {
-        // checking if the passwordResetToken and validatePasswordResetToken matches if they match then we save the newpassword to the database else we throw an exception
+        // checking if the passwordResetToken and validatePasswordResetToken matches if
+        // they match then we save the newpassword to the database else we throw an
+        // exception
         if (passwordModel.ValidatePasswordAndRetypedPassword()) {
             user.setPassword(passwordEncoder.encode(passwordModel.getNewpassword()));
             userRepository.save(user);
@@ -271,25 +294,31 @@ public class UserServiceImplementation implements UserService {
         throw new Exception("new Password and retyped new password does not match");
     }
 
-    // this method is used to change the password of the logged in user it takes the user object and the change password model which is given to us by the user and it contains old password , new password and retyped new password
+    // this method is used to change the password of the logged in user it takes the
+    // user object and the change password model which is given to us by the user
+    // and it contains old password , new password and retyped new password
     @Override
     public String changePassword(User user, @Valid ChangePasswordModel changePasswordModel) throws Exception {
 
-        // checking if the old password which the user sent and the password in the database match if they doesn't match then we throw an exception
-        if(!passwordEncoder.matches(changePasswordModel.getOldpassword(), user.getPassword())){
+        // checking if the old password which the user sent and the password in the
+        // database match if they doesn't match then we throw an exception
+        if (!passwordEncoder.matches(changePasswordModel.getOldpassword(), user.getPassword())) {
             throw new Exception("old password does not match please verify and try again");
         }
 
-        // checking if the new password and retyped new password matches if they doesn't match then we throw an exception
-        if(!changePasswordModel.ValidatePasswordAndRetypedPassword()){
+        // checking if the new password and retyped new password matches if they doesn't
+        // match then we throw an exception
+        if (!changePasswordModel.ValidatePasswordAndRetypedPassword()) {
             throw new Exception("new Password and retyped new password does not match");
         }
 
-        // if all the above conditions satisfy then we save the user to the database by changing his password
+        // if all the above conditions satisfy then we save the user to the database by
+        // changing his password
         user.setPassword(passwordEncoder.encode(changePasswordModel.getNewpassword()));
         userRepository.save(user);
 
-        // if the password saved successfully then we send a string named "Password changed successfully"
+        // if the password saved successfully then we send a string named "Password
+        // changed successfully"
         return "Password changed successfully";
 
     }
