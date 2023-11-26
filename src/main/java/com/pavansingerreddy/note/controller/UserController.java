@@ -86,10 +86,15 @@ public class UserController {
         throw new Exception("Bad User Details");
     }
 
-    @GetMapping("/resendVerifyToken")
-    public ResponseEntity<UserDto> resendVerificationToken(@RequestParam("email") String email)
-            throws UserNotFoundException {
+    @PostMapping("/resendVerifyToken")
+    public ResponseEntity<UserDto> resendVerificationToken(@RequestBody @Valid PasswordModel passwordModel)
+            throws UserNotFoundException,Exception {
+        String email = passwordModel.getEmail();
         User user = userService.getUserDetailsByEmail(email);
+        boolean isUserEnabled = user.isEnabled();
+        if(isUserEnabled){
+            throw new Exception("User is already verified");
+        }
         userService.deletePreviousTokenIfExists(user);
         publisher.publishEvent(new RegistrationCompleteEvent(user, UserApiApplicationUrl));
         return ResponseEntity.ok(DTOConversionUtil.userToUserDTO(user));

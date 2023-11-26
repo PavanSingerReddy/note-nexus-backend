@@ -216,6 +216,13 @@ public class UserServiceImplementation implements UserService {
         Optional<VerificationToken> verificationToken = verificationTokenRepository.findByUser(user);
 
         if (verificationToken.isPresent()) {
+            // as we have bidirectional one to one relationship between user and
+            // verification token we should remove the reference of the verification token
+            // from user object and then delete the verification instead of directly
+            // deleting the verification token because if we directly delete the
+            // verification token as we bidirectional one to one relationship with user the
+            // verification token still exists in the database
+            user.setVerificationToken(null);
             verificationTokenRepository.delete(verificationToken.get());
         }
 
