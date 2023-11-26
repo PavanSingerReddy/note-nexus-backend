@@ -7,7 +7,6 @@ import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -45,7 +44,7 @@ public class Note {
     private Date updatedAt;
   
 
-    @ManyToOne(fetch = FetchType.EAGER,optional = false,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.EAGER,optional = false)
     @JoinColumn(
         name = "user_id",
         referencedColumnName = "userId",
