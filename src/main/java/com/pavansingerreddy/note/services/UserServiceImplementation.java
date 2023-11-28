@@ -25,7 +25,7 @@ import com.pavansingerreddy.note.exception.UserAlreadyExistsException;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
 import com.pavansingerreddy.note.model.ChangePasswordModel;
 import com.pavansingerreddy.note.model.NormalUserModel;
-import com.pavansingerreddy.note.model.PasswordModel;
+import com.pavansingerreddy.note.model.ResetPasswordModel;
 import com.pavansingerreddy.note.model.UserModel;
 import com.pavansingerreddy.note.repository.PasswordResetTokenRepository;
 import com.pavansingerreddy.note.repository.UserRepository;
@@ -280,8 +280,6 @@ public class UserServiceImplementation implements UserService {
             passwordResetTokenRepository.delete(passwordResetToken);
             throw new Exception("Password Reset Token is expired request a new one");
         }
-        // deleting the password reset token after verifying it
-        passwordResetTokenRepository.delete(passwordResetToken);
         // returning the user assosiated with the token
         return user;
     }
@@ -289,12 +287,12 @@ public class UserServiceImplementation implements UserService {
     // taking the user object and the password model which contains the newpassword
     // and validatePasswordResetToken and resetting the user's password.
     @Override
-    public String resetPassword(User user, PasswordModel passwordModel) throws Exception {
+    public String resetPassword(User user, ResetPasswordModel resetPasswordModel) throws Exception {
         // checking if the passwordResetToken and validatePasswordResetToken matches if
         // they match then we save the newpassword to the database else we throw an
         // exception
-        if (passwordModel.ValidatePasswordAndRetypedPassword()) {
-            user.setPassword(passwordEncoder.encode(passwordModel.getNewpassword()));
+        if (resetPasswordModel.ValidatePasswordAndRetypedPassword()) {
+            user.setPassword(passwordEncoder.encode(resetPasswordModel.getNewpassword()));
             userRepository.save(user);
             return "password reset successful";
         }
@@ -328,6 +326,18 @@ public class UserServiceImplementation implements UserService {
         // changed successfully"
         return "Password changed successfully";
 
+    }
+
+    @Override
+    public void deletePasswordResetToken(String token) throws Exception {
+        // getting the passwordResetToken token from the database
+        PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(token);
+        // if the token does not exists we are throwing an exception
+        if (passwordResetToken == null) {
+            throw new Exception("Not a valid password reset Token");
+        }
+        // deleting the password reset token after verifying it
+        passwordResetTokenRepository.delete(passwordResetToken);
     }
 
 }

@@ -76,6 +76,7 @@ public class SecurityConfig {
                     auth.requestMatchers("/api/user/resendVerifyToken/**").permitAll();
                     auth.requestMatchers("/api/user/resetPassword/**").permitAll();
                     auth.requestMatchers("/api/user/verifyResetPassword/**").permitAll();
+                    auth.requestMatchers("/api/user/isValidPasswordResetToken/**").permitAll();
                     auth.anyRequest().authenticated();
                 })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -27,6 +27,7 @@ import com.pavansingerreddy.note.exception.UserNotFoundException;
 import com.pavansingerreddy.note.model.ChangePasswordModel;
 import com.pavansingerreddy.note.model.NormalUserModel;
 import com.pavansingerreddy.note.model.PasswordModel;
+import com.pavansingerreddy.note.model.ResetPasswordModel;
 import com.pavansingerreddy.note.model.UserModel;
 import com.pavansingerreddy.note.services.UserService;
 import com.pavansingerreddy.note.utils.DTOConversionUtil;
@@ -88,11 +89,11 @@ public class UserController {
 
     @PostMapping("/resendVerifyToken")
     public ResponseEntity<UserDto> resendVerificationToken(@RequestBody @Valid PasswordModel passwordModel)
-            throws UserNotFoundException,Exception {
+            throws UserNotFoundException, Exception {
         String email = passwordModel.getEmail();
         User user = userService.getUserDetailsByEmail(email);
         boolean isUserEnabled = user.isEnabled();
-        if(isUserEnabled){
+        if (isUserEnabled) {
             throw new Exception("User is already verified");
         }
         userService.deletePreviousTokenIfExists(user);
@@ -130,21 +131,35 @@ public class UserController {
         return ResponseEntity.ok("sent url to reset password successfully");
     }
 
+    @GetMapping("/isValidPasswordResetToken")
+    public ResponseEntity<Boolean> isValidPasswordResetToken(@RequestParam("token") String token) throws Exception {
+        User user = userService.validatePasswordResetToken(token);
+        if (user == null) {
+            return ResponseEntity.ok(false);
+        }
+        return ResponseEntity.ok(true);
+    }
+
     @PostMapping("/verifyResetPassword")
     // The /verifyResetPassword api endpoint verifies the reset password request
     // which we sent to the user's email with url containing UUID as the token.we
-    // are taking token which is sent as a query parameter and the password model as
+    // are taking token which is sent as a query parameter and the reset password
+    // model as
     // a body of the post request which contains newpassword and retypednewpassword
     // as a json with the request
     public ResponseEntity<String> verifyResetPassword(@RequestParam("token") String token,
-            @RequestBody PasswordModel passwordModel) throws Exception {
+            @RequestBody @Valid ResetPasswordModel resetPasswordModel) throws Exception {
         // The validatePasswordResetToken checks if the token is valid and not expired
         // and returns the user assosiated with the token
         User user = userService.validatePasswordResetToken(token);
-        // it takes the user object and the password model and checks if the new
-        // passoword and retyped new password matches if they match then it saves the
+
+        // deleting the password reset token after verifying it
+        userService.deletePasswordResetToken(token);
+
+        // it takes the user object and the reset password model and checks if the new
+        // password and retyped new password matches if they match then it saves the
         // new password in the database else it throws an exception
-        return ResponseEntity.ok(userService.resetPassword(user, passwordModel));
+        return ResponseEntity.ok(userService.resetPassword(user, resetPasswordModel));
 
     }
 
