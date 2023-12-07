@@ -12,8 +12,9 @@ import com.pavansingerreddy.note.events.event_publisher.PasswordResetEvent;
 import com.pavansingerreddy.note.services.EmailService;
 import com.pavansingerreddy.note.services.UserService;
 
-// making it as component so that spring can recognise it as the component and create a bean for it
+// making it as component so that spring can recognize it as the component and create a bean for it
 @Component
+// This event get's triggered when we forget a password and want to reset the password and call the api for resetting the password
 public class PasswordResetEventListener implements ApplicationListener<PasswordResetEvent> {
 
     // getting user service so that we can perform the operations related to the user

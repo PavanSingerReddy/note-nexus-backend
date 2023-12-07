@@ -6,15 +6,18 @@ import java.util.Map;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import com.pavansingerreddy.note.exception.InvalidUserDetailsException;
+import com.pavansingerreddy.note.exception.PasswordDoesNotMatchException;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
 
-// Controller advice which handles the errors occured in all my Rest Api endpoints
+// Controller advice which handles the errors occurred in all my Rest Api endpoints
 @RestControllerAdvice
 public class GlobalRESTExceptionHandler {
 
@@ -33,14 +36,13 @@ public class GlobalRESTExceptionHandler {
         // messages.
         Map<String, String> errorMap = new HashMap<>();
         // Get the BindingResult from the exception. The BindingResult contains the
-        // result of the validation.
-        // Call getFieldErrors() to get a list of FieldError objects. Each FieldError
-        // represents a validation error on a specific field.
+        // result of the validation. Call getFieldErrors() to get a list of FieldError
+        // objects. Each FieldError represents a validation error on a specific field.
         // Use a forEach loop to iterate over each FieldError.
         exception.getBindingResult().getFieldErrors().forEach(error -> {
             // For each FieldError, get the field name with getField() and the error message
-            // with getDefaultMessage().
-            // Put the field name and error message into the errorMap.
+            // with getDefaultMessage(). Put the field name and error message into the
+            // errorMap.
             errorMap.put(error.getField(), error.getDefaultMessage());
 
         });
@@ -60,7 +62,8 @@ public class GlobalRESTExceptionHandler {
 
         Map<String, String> errorMap = new HashMap<>();
 
-        errorMap.put("errorMessage", exception.getMostSpecificCause().getMessage());
+        errorMap.put("errorMessage",
+                "Sorry, we couldn't process your request due to a data integrity issue. Please ensure your input is valid and try again.");
 
         return errorMap;
     }
@@ -68,8 +71,7 @@ public class GlobalRESTExceptionHandler {
     // sending 400 as http response if we got IllegalArgumentException
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     // The IllegalArgumentException is an unchecked exception in Java that is thrown
-    // to indicate that a method has been passed an illegal or inappropriate
-    // argument
+    // to indicate that a method has passed an illegal or inappropriate argument
     @ExceptionHandler(IllegalArgumentException.class)
     // function which handles the IllegalArgumentException
     public Map<String, String> handleIllegalArgumentException(IllegalArgumentException exception) {
@@ -106,7 +108,8 @@ public class GlobalRESTExceptionHandler {
     public Map<String, String> handleHttpMediaTypeNotSupportedException(HttpMediaTypeNotSupportedException exception) {
         Map<String, String> errorMap = new HashMap<>();
 
-        errorMap.put("errorMessage", exception.getMessage());
+        errorMap.put("errorMessage",
+                "Sorry, we couldn't process your request because the provided media type is not supported. Please ensure your request has the correct 'Content-Type' header and try again.");
 
         return errorMap;
     }
@@ -128,6 +131,46 @@ public class GlobalRESTExceptionHandler {
         return errorMap;
     }
 
+    // sending 400 as http response if we got InvalidUserDetailsException
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    // This is a custom exception which get's thrown if the user details are invalid
+    @ExceptionHandler(InvalidUserDetailsException.class)
+    // function which handles the InvalidUserDetailsException
+    public Map<String, String> handleInvalidUserDetailsException(InvalidUserDetailsException exception) {
+        Map<String, String> errorMap = new HashMap<>();
+
+        errorMap.put("errorMessage", exception.getMessage());
+
+        return errorMap;
+    }
+
+    // sending 400 as http response if we got PasswordDoesNotMatchException
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    // This is a custom exception which get's thrown if the password of the user's
+    // account does not match
+    @ExceptionHandler(PasswordDoesNotMatchException.class)
+    // function which handles the PasswordDoesNotMatchException
+    public Map<String, String> handlePasswordDoesNotMatchException(PasswordDoesNotMatchException exception) {
+        Map<String, String> errorMap = new HashMap<>();
+
+        errorMap.put("errorMessage", exception.getMessage());
+
+        return errorMap;
+    }
+
+    // sending 400 as http response if we got DisabledException
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    // This is a exception which get's thrown if the User account is disabled
+    @ExceptionHandler(DisabledException.class)
+    // function which handles the DisabledException
+    public Map<String, String> handleDisabledException(DisabledException exception) {
+        Map<String, String> errorMap = new HashMap<>();
+
+        errorMap.put("errorMessage", exception.getMessage());
+
+        return errorMap;
+    }
+
     // sending 400 as http response if we got any other Exception
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     // Exception is the super class of all exceptions so if any other exceptions
@@ -137,7 +180,7 @@ public class GlobalRESTExceptionHandler {
     public Map<String, String> handleAllException(Exception exception) {
         Map<String, String> errorMap = new HashMap<>();
 
-        errorMap.put("errorMessage", exception.getMessage());
+        errorMap.put("errorMessage", "Some unknown error occurred please try again");
 
         return errorMap;
     }

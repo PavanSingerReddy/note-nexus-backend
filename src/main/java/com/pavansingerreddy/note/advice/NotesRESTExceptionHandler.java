@@ -12,7 +12,7 @@ import com.pavansingerreddy.note.controller.NotesController;
 import com.pavansingerreddy.note.exception.NoteDoesNotExistsException;
 
 
-// Controller advice which handles the errors occured in my NotesController endpoints
+// Controller advice which handles the errors occurred in my NotesController endpoints
 @RestControllerAdvice(basePackageClasses = NotesController.class)
 public class NotesRESTExceptionHandler {
 

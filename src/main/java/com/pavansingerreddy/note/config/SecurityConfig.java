@@ -28,93 +28,185 @@ import com.pavansingerreddy.note.authentication_providers.JwtAuthenticationProvi
 import com.pavansingerreddy.note.csrf.CsrfCookieFilter;
 import com.pavansingerreddy.note.csrf.SPACsrfTokenRequestHandler;
 
+// configuration annotation is used on classes which define beans. @Configuration classes are also @Component classes, so they are candidates for component scanning. But they have an added benefit: they can also define @Bean methods, which return instances of beans. These beans are managed by Spring and can be injected into other beans.
 @Configuration
+
+// The @EnableWebSecurity annotation in Spring Security is used to enable web
+// security support in the application. This annotation is crucial because it
+// does a couple of important things:
+
+// 1. It imports the SpringSecurityFilterChain, which is a security filter chain
+// that is automatically applied to all incoming requests.
+
+// 2. It enables the @Configuration annotation on the class. This means that the
+// annotated class can be used by Spring IoC container as a source of bean
+// definitions.
+
+// Without the @EnableWebSecurity annotation, the Spring Security configuration
+// would not be fully set up, and your application would not be secured.
 @EnableWebSecurity
-@EnableMethodSecurity(
-    jsr250Enabled = true, // enables the JSR-250 standard java security annotations, like @RolesAllowed
-    prePostEnabled = true   // enables the PreAuthorize and PostAuthorize annotations
+@EnableMethodSecurity(jsr250Enabled = true, // enables the JSR-250 standard java security annotations, like
+                                            // @RolesAllowed
+        prePostEnabled = true // enables the PreAuthorize and PostAuthorize annotations
 )
 public class SecurityConfig {
 
-
+    // Autowiring a JWTTokenFilter class which gives us an object(bean) of
+    // JWTTokenFilter from the spring IOC container.JWTTokenFilter is a custom
+    // filter which is used to check if the user is authenticated or not
     @Autowired
     private JWTTokenFilter jwtTokenFilter;
 
-    
+    // Autowiring a JwtAuthenticationProvider class which gives us an object(bean)
+    // of JwtAuthenticationProvider from the spring IOC container.it is one of the
+    // authentication provider in the authentication manager
     @Autowired
     JwtAuthenticationProvider jwtAuthenticationProvider;
 
+    // Autowiring a AuthenticationEntryPoint class which gives us an object(bean) of
+    // AuthenticationEntryPoint from the spring IOC
+    // container.customAuthenticationEntryPoint is our custom implementation of the
+    // AuthenticationEntryPoint which get's triggered when ever there is any
+    // authentication errors
     @Autowired
     AuthenticationEntryPoint customAuthenticationEntryPoint;
 
+    // Autowiring a AccessDeniedHandler class which gives us an object(bean) of
+    // AccessDeniedHandler from the spring IOC container.customAccessDeniedHandler
+    // is our custom implementation of the AccessDeniedHandler which get's triggered
+    // when ever there is any authorization errors or whenever we are trying to
+    // access a resource which we don't have permission
     @Autowired
     AccessDeniedHandler customAccessDeniedHandler;
 
-
+    // Bean annotation tells Spring that the authenticationManager() method will
+    // return an object that should be registered as a bean in the Spring
+    // application context.
     @Bean
-    public AuthenticationManager authenticationManager(){
+    // defining our AuthenticationManager bean which uses
+    // new ProviderManager (which is a concrete implementation of
+    // AuthenticationManager) with jwtAuthenticationProvider as its only
+    // AuthenticationProvider
+    public AuthenticationManager authenticationManager() {
         return new ProviderManager(jwtAuthenticationProvider);
     }
 
-
+    // Bean annotation tells Spring that the method will return an object that
+    // should be registered as a bean in the Spring application context.
     @Bean
-    public SecurityFilterChain loginAndRegisterSecurityFilterChain(HttpSecurity httpSecurity) throws Exception{
+    public SecurityFilterChain loginAndRegisterSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+        // httpSecurity is the HttpSecurity instance that we're configuring based on our
+        // needs.
         return httpSecurity
-                // .csrf(csrf->csrf.disable())
-                // .csrf(Customizer.withDefaults())
+                // Configuring Cross-Site Request Forgery (CSRF) protection.
                 .csrf((csrf) -> csrf
-				.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())   
-				.csrfTokenRequestHandler(new SPACsrfTokenRequestHandler())   
-                // .ignoringRequestMatchers("/api/user/csrf-token/**")         
-			)
-			.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
-                .authorizeHttpRequests(auth->{
-                    auth.requestMatchers("/api/user/login/**").permitAll();
-                    auth.requestMatchers("/api/user/register/**").permitAll();
-                    auth.requestMatchers("/api/user/csrf-token/**").permitAll();
-                    auth.requestMatchers("/api/user/verifyRegistration/**").permitAll();
-                    auth.requestMatchers("/api/user/resendVerifyToken/**").permitAll();
-                    auth.requestMatchers("/api/user/resetPassword/**").permitAll();
-                    auth.requestMatchers("/api/user/verifyResetPassword/**").permitAll();
-                    auth.requestMatchers("/api/user/isValidPasswordResetToken/**").permitAll();
+                        // Using a CSRF token repository that stores the CSRF token in a cookie.
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        // Using a custom CSRF token request handler which resolves the csrf token
+                        // provided by the client.The csrf token will be generally included in the
+                        // request header from the client when we use single page applications like
+                        // react or angular.
+                        .csrfTokenRequestHandler(new SPACsrfTokenRequestHandler()))
+                // The CsrfCookieFilter is added after the BasicAuthenticationFilter because you
+                // want to perform CSRF validation after the user has been authenticated. This
+                // is because CSRF protection is typically needed for requests that could change
+                // the state on the server side (like a money transfer in a banking
+                // application), and these requests should be authenticated.
+                .addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class)
+                // Configuring authorization for HTTP requests.
+                .authorizeHttpRequests(auth -> {
+                    // Permitting all requests to "/api/user/login" without authenticating and all
+                    // the other following endpoints like /api/user/register,/api/user/csrf-token ,
+                    // etc.
+                    auth.requestMatchers("/api/user/login").permitAll();
+                    auth.requestMatchers("/api/user/register").permitAll();
+                    auth.requestMatchers("/api/user/csrf-token").permitAll();
+                    auth.requestMatchers("/api/user/verifyRegistration").permitAll();
+                    auth.requestMatchers("/api/user/resendVerifyToken").permitAll();
+                    auth.requestMatchers("/api/user/resetPassword").permitAll();
+                    auth.requestMatchers("/api/user/verifyResetPassword").permitAll();
+                    auth.requestMatchers("/api/user/isValidPasswordResetToken").permitAll();
+                    // Requiring authentication for all other requests.
                     auth.anyRequest().authenticated();
                 })
+                // Configuring the application to be stateless, i.e., not to create a session as
+                // we are using jwt's.
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // Adding our custom jwtTokenFilter filter before the
+                // UsernamePasswordAuthenticationFilter.our jwtTokenFilter checks if the user is
+                // authenticated or not
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling((exceptionHandling)->{
+                // Configuring exception handling.
+                .exceptionHandling((exceptionHandling) -> {
+                    // Using a custom authentication entry point for handling authentication related
+                    // exceptions.
                     exceptionHandling.authenticationEntryPoint(customAuthenticationEntryPoint);
+                    // Using a custom access denied handler for handling authorization related
+                    // exceptions.
                     exceptionHandling.accessDeniedHandler(customAccessDeniedHandler);
                 })
+                // Configuring logout handling.
                 .logout((logout) -> logout
-				// .logoutRequestMatcher(new AntPathRequestMatcher("/api/logout"))
-                .logoutUrl("/api/user/logout")
-                .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
-                .deleteCookies("JWT")
-                )
-                .headers((headers)->{
+                        // Setting the logout URL.
+                        .logoutUrl("/api/user/logout")
+                        // Using a logout success handler that returns the HTTP status like 200(ok) if
+                        // the logout is successful.
+                        .logoutSuccessHandler(new HttpStatusReturningLogoutSuccessHandler())
+                        // Deleting the "JWT" cookie upon logout and the XSRF-TOKEN cookie is
+                        // automatically delete by default when we logout if we want any other cookies
+                        // to be deleted we can specify here.
+                        .deleteCookies("JWT"))
+                // Configuring headers.
+                .headers((headers) -> {
+                    // Enabling XSS protection with default settings for the older browsers and has
+                    // some security flaws.
                     headers.xssProtection(Customizer.withDefaults());
-                    headers.contentSecurityPolicy(csp->csp.policyDirectives("script-src 'self'"));
+                    // Setting the Content Security Policy to only allow scripts from the same
+                    // origin.this CSP is for enabling Xss protection for newer browsers.
+                    headers.contentSecurityPolicy(csp -> csp.policyDirectives("script-src 'self'"));
                 })
-                // .cors(Customizer.withDefaults())
-                .cors((cors)->cors.configurationSource(corsConfigurationSource()))
+                // Configuring Cross-Origin Resource Sharing (CORS) with a custom configuration
+                // source.
+                .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
+                // Building the SecurityFilterChain.
                 .build();
     }
 
+    // Bean annotation tells Spring that this method will return a bean that should
+    // be managed by the Spring container.
     @Bean
-    CorsConfigurationSource corsConfigurationSource(){
+    // This method returns a CorsConfigurationSource object.
+    CorsConfigurationSource corsConfigurationSource() {
+        // Create a new CorsConfiguration object.
         CorsConfiguration configuration = new CorsConfiguration();
+        // below line is commented out. If uncommented, it would allow all origins.
         // configuration.setAllowedOrigin(Arrays.asList("*"));
+        // This allows all origins using a wildcard "*".
         configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type","X-XSRF-TOKEN"));
+        // This sets the allowed HTTP methods.
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
+        // This sets the allowed HTTP headers.
+        configuration
+                .setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "X-XSRF-TOKEN"));
+        // The line configuration.setAllowCredentials(true); is used to allow user
+        // credentials to be included in the CORS request. This means that cookies,
+        // authorization headers or TLS client certificates will be sent with the
+        // request.
+
+        // If you remove this line, the default behavior will be used, which is not to
+        // include user credentials in the CORS request. This means that cookies,
+        // authorization headers or TLS client certificates will not be sent with the
+        // request. setAllowCredentials allows user credentials to be included in the
+        // CORS request.
         configuration.setAllowCredentials(true);
+        // Create a new UrlBasedCorsConfigurationSource object.
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/user/register/**", configuration);
-        source.registerCorsConfiguration("/api/user/login/**", configuration);
+        // Register the CorsConfiguration for all endpoints under "/api/user/**".
         source.registerCorsConfiguration("/api/user/**", configuration);
+        // Register the CorsConfiguration for all endpoints under "/api/notes/**".
         source.registerCorsConfiguration("/api/notes/**", configuration);
+        // Return the CorsConfigurationSource object.
         return source;
     }
-
 
 }

@@ -4,6 +4,9 @@ import java.util.Map;
 
 import com.pavansingerreddy.note.dto.UserDto;
 import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.exception.InvalidUserDetailsException;
+import com.pavansingerreddy.note.exception.PasswordDoesNotMatchException;
+import com.pavansingerreddy.note.exception.UserAlreadyExistsException;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
 import com.pavansingerreddy.note.model.ChangePasswordModel;
 import com.pavansingerreddy.note.model.NormalUserModel;
@@ -14,7 +17,7 @@ import jakarta.validation.Valid;
 
 public interface UserService {
 
-    User createUser(UserModel userModel) throws Exception;
+    User createUser(UserModel userModel) throws UserAlreadyExistsException,PasswordDoesNotMatchException;
 
     User getUserDetailsByEmail(String userEmail) throws UserNotFoundException;
 
@@ -34,12 +37,12 @@ public interface UserService {
 
     void savePasswordResetToken(String token, User user);
 
-    User validatePasswordResetToken(String token) throws Exception;
+    User validatePasswordResetToken(String token) throws InvalidUserDetailsException;
 
-    String resetPassword(User user, ResetPasswordModel resetPasswordModel) throws Exception;
+    String resetPassword(User user, ResetPasswordModel resetPasswordModel) throws InvalidUserDetailsException;
 
-    String changePassword(User user, @Valid ChangePasswordModel changePasswordModel) throws Exception;
+    String changePassword(User user, @Valid ChangePasswordModel changePasswordModel) throws InvalidUserDetailsException;
 
-    void deletePasswordResetToken(String token) throws Exception;
+    void deletePasswordResetToken(String token) throws InvalidUserDetailsException;
     
 }
