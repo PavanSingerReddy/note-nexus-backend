@@ -1,6 +1,7 @@
 package com.pavansingerreddy.note.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -16,13 +17,19 @@ public class EmailService {
     // Here, it's injecting an instance of JavaMailSender, which is a Spring
     // interface for sending emails.
     @Autowired
-    private JavaMailSender mailSender;
+    @Qualifier("mailSender1")
+    private JavaMailSender mailSender1;
 
-    // @Value is a Spring annotation which indicates a default value expression for
-    // the field. Here, it's injecting the username for the email account (defined
-    // in application properties file) that will be used to send emails.
-    @Value("${spring.mail.username}")
-    private String fromEmail;
+    @Autowired
+    @Qualifier("mailSender2")
+    private JavaMailSender mailSender2;
+
+    @Value("${mail.config1.username}")
+    private String fromEmail1;
+
+    @Value("${mail.config2.username}")
+    private String fromEmail2;
+
 
     // This method is used to send an email. It takes the recipient's email address,
     // email subject, and email body as parameters.
@@ -31,8 +38,6 @@ public class EmailService {
         // Creating a new instance of SimpleMailMessage which is a helper class for
         // creating a JavaMail MimeMessage.
         SimpleMailMessage mailMessage = new SimpleMailMessage();
-        // Setting the sender's email address.
-        mailMessage.setFrom(fromEmail);
         // Setting the recipient's email address.
         mailMessage.setTo(toEmail);
         // Setting the body of the email.
@@ -44,13 +49,24 @@ public class EmailService {
         // If the email is sent successfully, the method returns true.
         // If there's an exception (email not sent), the method returns false.
         try {
-            mailSender.send(mailMessage);
+            mailMessage.setFrom(fromEmail1);
+            mailSender1.send(mailMessage);
             return true;
         } catch (Exception e) {
-            System.out.println("Failed to send email to " + toEmail);
+            System.out.println("Failed to send email to " + toEmail + " using mail configuration 1");
             System.out.println(e);
-            return false;
         }
+
+        try {
+            mailMessage.setFrom(fromEmail2);
+            mailSender2.send(mailMessage);
+            return true;
+        } catch (Exception e) {
+            System.out.println("Failed to send email to " + toEmail + " using mail configuration 2");
+            System.out.println(e);
+        }
+
+        return false;
 
     }
 

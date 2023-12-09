@@ -23,5 +23,65 @@
     "name": "frontend.applicationUrl.user.api",
     "type": "java.lang.String",
     "description": "User api url"
+  },
+  {
+    "name": "mail.config1.host",
+    "type": "java.lang.String",
+    "description": "SMTP server host for mail configuration 1"
+  },
+  {
+    "name": "mail.config1.port",
+    "type": "java.lang.Integer",
+    "description": "SMTP server port for mail configuration 1"
+  },
+  {
+    "name": "mail.config1.username",
+    "type": "java.lang.String",
+    "description": "Username for mail configuration 1"
+  },
+  {
+    "name": "mail.config1.password",
+    "type": "java.lang.String",
+    "description": "Password for mail configuration 1"
+  },
+  {
+    "name": "mail.config1.properties.mail.smtp.auth",
+    "type": "java.lang.Boolean",
+    "description": "SMTP auth property for mail configuration 1"
+  },
+  {
+    "name": "mail.config1.properties.mail.smtp.starttls.enable",
+    "type": "java.lang.Boolean",
+    "description": "SMTP starttls.enable property for mail configuration 1"
+  },
+  {
+    "name": "mail.config2.host",
+    "type": "java.lang.String",
+    "description": "SMTP server host for mail configuration 1"
+  },
+  {
+    "name": "mail.config2.port",
+    "type": "java.lang.Integer",
+    "description": "SMTP server port for mail configuration 1"
+  },
+  {
+    "name": "mail.config2.username",
+    "type": "java.lang.String",
+    "description": "Username for mail configuration 1"
+  },
+  {
+    "name": "mail.config2.password",
+    "type": "java.lang.String",
+    "description": "Password for mail configuration 1"
+  },
+  {
+    "name": "mail.config2.properties.mail.smtp.auth",
+    "type": "java.lang.Boolean",
+    "description": "SMTP auth property for mail configuration 1"
+  },
+  {
+    "name": "mail.config2.properties.mail.smtp.starttls.enable",
+    "type": "java.lang.Boolean",
+    "description": "SMTP starttls.enable property for mail configuration 1"
   }
 ]}

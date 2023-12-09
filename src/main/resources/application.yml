@@ -7,17 +7,6 @@ spring:
     hibernate:
       ddl-auto: update
     show-sql: true
-  mail:
-    host:   #enter your smtp server like smtp-mail.outlook.com for outlook etc...
-    port: 587
-    username:   #enter your email id of the email account which is assosiated with the above smtp server
-    password:   #enter the app password of your email account
-    properties: 
-      mail: 
-        smtp: 
-          auth: true
-          starttls: 
-            enable: true
 
 # uncomment below logging details so that you can see each step of the debug process while the application is getting executed
 
@@ -49,3 +38,29 @@ jwt:
   token:
     expiry: 
       seconds: 60000
+
+
+#our custom mail configuration
+mail:
+  config1:
+    host: #enter your smtp server like smtp-mail.outlook.com for outlook etc...
+    port: 587
+    username:  #enter your email id of the email account which is assosiated with the above smtp
+    password: #enter the app password of your email account
+    properties: 
+      mail: 
+        smtp: 
+          auth: true
+          starttls: 
+            enable: true
+  config2:
+    host: #enter your smtp server like smtp-mail.outlook.com for outlook etc...
+    port: 587
+    username: #enter your email id of the email account which is assosiated with the above smtp
+    password: #enter the app password of your email account
+    properties: 
+      mail: 
+        smtp: 
+          auth: true
+          starttls: 
+            enable: true
