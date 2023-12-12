@@ -1,8 +1,12 @@
 package com.pavansingerreddy.note.entity;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -83,6 +87,16 @@ public class User implements UserDetails {
     @JoinTable(name = "User_Role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     // roles field holds the roles associated with the user.
     private Set<Role> roles;
+    // Time which reflects when the user is created
+    private Date userCreatedAtTime;
+    // when we create a next new user we can check for this time and send email
+    // based on this time for verifying the new user we don't get blocked by our
+    // email provider for spam
+    @Column(name = "new_user_can_be_created_at_time")
+    private Date newUserCanBeCreatedAtTime;
+    // mailNoToUseForSendingEmail contains the email number from the email service
+    // providers in the application.yml which is used to verify this user
+    private int mailNoToUseForSendingEmail;
     // enabled field indicates whether the user is enabled.
     private boolean enabled = false;
     // OneToOne annotation defines a one-to-one relationship between the User and
@@ -140,6 +154,30 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         // Return the enabled status of the user.
         return this.enabled;
+    }
+
+    // This method assigns the current time to the userCreatedAtTime variable and
+    // then assigns a random time which is between 5 to 10 minutes ahead of the
+    // current time to the newUserCanBeCreatedAtTime so that when we create a next
+    // new user we can check for this time and send email based on this time for
+    // verifying the new user we don't get blocked by our email provider for spam
+    public void updateUserCreatedAtTimeAndNewUserCanBeCreatedAtTime() {
+        // assigning the userCreatedAtTime variable the current time
+        this.userCreatedAtTime = Date.from(Instant.now());
+        // generating a random number between 5(inclusive) to 11(exclusive) so that we
+        // may get the number from 5-10 which we assign to the randomMinutes variable
+        int randomMinutes = ThreadLocalRandom.current().nextInt(5, 11);
+        // generating a random number between 0(inclusive) to 60(exclusive) so that we
+        // may get the number from 0-59 which we assign to the randomSeconds variable
+        int randomSeconds = ThreadLocalRandom.current().nextInt(0, 60);
+        // we are getting the minutes from integer variable
+        Duration minutesToAdd = Duration.ofMinutes(randomMinutes);
+        // we are adding our newly generated minutes and seconds and assigning the newly
+        // created date object to the newUserCanBeCreatedAtTime so that when we are
+        // creating the next new user we can check this time and decide when the new
+        // user can be created so that when we are sending the email when we create a
+        // next new user we don't banned by our email service provider for spam
+        this.newUserCanBeCreatedAtTime = Date.from(Instant.now().plus(minutesToAdd).plusSeconds(randomSeconds));
     }
 
 }

@@ -17,7 +17,7 @@ import jakarta.validation.Valid;
 
 public interface UserService {
 
-    User createUser(UserModel userModel) throws UserAlreadyExistsException,PasswordDoesNotMatchException;
+    User createUser(UserModel userModel,int mailNoToUse) throws UserAlreadyExistsException,PasswordDoesNotMatchException;
 
     User getUserDetailsByEmail(String userEmail) throws UserNotFoundException;
 
@@ -44,5 +44,7 @@ public interface UserService {
     String changePassword(User user, @Valid ChangePasswordModel changePasswordModel) throws InvalidUserDetailsException;
 
     void deletePasswordResetToken(String token) throws InvalidUserDetailsException;
+
+    Integer getLatestEmailToUse() throws InvalidUserDetailsException;
     
 }

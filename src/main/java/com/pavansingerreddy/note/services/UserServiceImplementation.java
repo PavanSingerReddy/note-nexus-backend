@@ -1,11 +1,14 @@
 package com.pavansingerreddy.note.services;
 
+import java.time.Instant;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,7 +88,8 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     // This method is used to create user when the user get's registered or signs up
-    public User createUser(UserModel userModel) throws UserAlreadyExistsException, PasswordDoesNotMatchException {
+    public User createUser(UserModel userModel, int mailNoToUse)
+            throws UserAlreadyExistsException, PasswordDoesNotMatchException {
 
         // findByEmail method of user repository gives us the user object from the
         // user's email.findByEmail method returns optional User because it is not null
@@ -136,6 +140,17 @@ public class UserServiceImplementation implements UserService {
             // and encoding it to an unreadable value so that even though the database is
             // compromised user's password should not be leaked
             user.setPassword(passwordEncoder.encode(user.getPassword()));
+            // This method assigns the current time to the userCreatedAtTime variable of the
+            // user object and then assigns a random time which is between 5 to 10 minutes
+            // ahead of the current time to the newUserCanBeCreatedAtTime variable of the
+            // user object so that when we create a next new user we can check for this time
+            // and send email based on this time for verifying the new user we don't get
+            // blocked by our email provider for spam
+            user.updateUserCreatedAtTimeAndNewUserCanBeCreatedAtTime();
+            // setting the mailNoToUseForSendingEmail of the user which represents which
+            // mail we have used from our mail providers list for sending the verification
+            // email for this user
+            user.setMailNoToUseForSendingEmail(mailNoToUse);
             // saving our new user to the database using our userRepository
             userRepository.save(user);
             // after saving our user in the database we are returning our new user object
@@ -482,6 +497,54 @@ public class UserServiceImplementation implements UserService {
         }
         // deleting the password reset token after verifying it
         passwordResetTokenRepository.delete(passwordResetToken);
+    }
+
+    @Override
+    // we have multiple mail senders in our application.yml file so this method
+    // getLatestEmailToUse() returns us the appropriate mail sender to use to send
+    // email so that we don't get marked as spam by our email service provider like
+    // gmail or outlook.
+    public Integer getLatestEmailToUse() throws InvalidUserDetailsException {
+
+        // This findTheUserWhoContainsTheAppropriateEmailToSendSignUpUrl() gets the
+        // latest signed up user who's mailNoToUseForSendingEmail has the lowest
+        // newUserCanBeCreatedAtTime
+        Optional<User> userOptional = userRepository.findTheUserWhoContainsTheAppropriateEmailToSendSignUpUrl();
+        // if any user is present then we get the user and check if the
+        // getNewUserCanBeCreatedAtTime for that user is greater than the current time
+        // if it is greater then we throw an InvalidUserDetailsException else we return
+        // 1 which indicates to choose the first email provider as we will be having at
+        // least one email provider to send emails
+        if (userOptional.isPresent()) {
+            // getting the user from the optional user
+            User user = userOptional.get();
+            // getting the current date
+            Date currentDate = Date.from(Instant.now());
+            // user.getNewUserCanBeCreatedAtTime().compareTo(currentDate) returns 0 if the
+            // dates are equal, a value less than 0 if user.getNewUserCanBeCreatedAtTime()
+            // is before currentDate, and a value greater than 0 if
+            // user.getNewUserCanBeCreatedAtTime() is after currentDate
+            if (user.getNewUserCanBeCreatedAtTime().compareTo(currentDate) > 0) {
+                // Calculate difference in milliseconds
+                long diffInMilli = Math.abs(user.getNewUserCanBeCreatedAtTime().getTime() - currentDate.getTime());
+
+                // Convert to minutes and seconds
+                long diffInMinutes = TimeUnit.MILLISECONDS.toMinutes(diffInMilli);
+                long diffInSeconds = TimeUnit.MILLISECONDS.toSeconds(diffInMilli) -
+                        TimeUnit.MINUTES.toSeconds(diffInMinutes);
+
+                // throw an Exception with message which indicates when the new user can be
+                // created so that our email service provider cannot be suspected for spam
+                throw new InvalidUserDetailsException("Email service is busy right now try after " + diffInMinutes
+                        + " minutes and " + diffInSeconds + " seconds");
+            }
+            // if the user.getNewUserCanBeCreatedAtTime() is less than the current time then
+            // we can return the user's mailNoToUseForSendingEmail so that our controller
+            // can use this and register event with this value and our event listener will
+            // choose the email provider and send the email based on this value
+            return user.getMailNoToUseForSendingEmail();
+        }
+        return 1;
     }
 
 }

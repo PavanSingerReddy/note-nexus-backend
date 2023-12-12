@@ -137,20 +137,27 @@ public class UserController {
     // to our user model class.we are using @Valid annotation because
     // we want to validate the request's json body input.
     public ResponseEntity<UserDto> createUser(@RequestBody @Valid UserModel userModel)
-            throws UserAlreadyExistsException, PasswordDoesNotMatchException {
+            throws UserAlreadyExistsException, PasswordDoesNotMatchException, InvalidUserDetailsException {
+        // we have multiple mail senders in our application.yml file so this method
+        // getLatestEmailToUse() returns us the appropriate mail sender to use to send
+        // email so that we don't get marked as spam by our email service provider like
+        // gmail or outlook.
+        int mailNoToUse = userService.getLatestEmailToUse();
         // createUser method from the userService is used to check if the password and
         // retyped password match and also used to check if the user is already present
         // and already enable then it throws an exception and if the user is present and
         // not enabled then it deletes the previous user and creates a new user.if the
-        // user is not present then it creates a new user
-        User user = userService.createUser(userModel);
+        // user is not present then it creates a new user with the details provided by
+        // the userModel and the mailNoToUse variable
+        User user = userService.createUser(userModel, mailNoToUse);
         // publishing a new RegistrationCompleteEvent which send's the event for sending
         // an email for the registered user with the verification token.We are using
         // event here as sending an email for the user is a separate task from the main
         // task of creating a new user.Here application url contains the root path or
         // url of the frontend application and User object contains the details of the
-        // registered new user
-        publisher.publishEvent(new RegistrationCompleteEvent(user, UserApiApplicationUrl));
+        // registered new user and the mailNoToUse contains the mail number from our
+        // mail providers to use for sending the email for verification
+        publisher.publishEvent(new RegistrationCompleteEvent(user, UserApiApplicationUrl, mailNoToUse));
         // after publishing the event we are returning the response of user information
         // using UserDto as we made the RegistrationCompleteEventListener Async we will
         // not wait for the mail to get sent the event runs on a separate thread and the
@@ -208,12 +215,15 @@ public class UserController {
         // token if it exists then we are deleting the verification token for that
         // particular user
         userService.deletePreviousTokenIfExists(user);
-        // now we are publishing the RegistrationCompleteEvent with the user object and
-        // the frontend application url which triggers the
-        // RegistrationCompleteEventListener and RegistrationCompleteEventListener
-        // creates a new verification token and associates it with the user and send's
-        // the email to the user with the url for verifying the verification token
-        publisher.publishEvent(new RegistrationCompleteEvent(user, UserApiApplicationUrl));
+        // now we are publishing the RegistrationCompleteEvent with the user object,
+        // frontend application url and the mailNoToUse which contains the mail number
+        // from our mail providers to use for sending the email for verification which
+        // triggers the RegistrationCompleteEventListener and
+        // RegistrationCompleteEventListener creates a new verification token and
+        // associates it with the user and send's the email to the user with the url for
+        // verifying the verification token
+        publisher.publishEvent(
+                new RegistrationCompleteEvent(user, UserApiApplicationUrl, user.getMailNoToUseForSendingEmail()));
         // returning the http 200(ok) response with UserDto by converting the user to
         // the userDto by our custom made class called DTOConversionUtil
         return ResponseEntity.ok(DTOConversionUtil.userToUserDTO(user));
@@ -241,10 +251,13 @@ public class UserController {
         // PasswordResetToken entity is mapped with one to one relationship with the
         // user
         userService.deletePreviousPasswordResetTokenIfExists(user);
-        // publishing a PasswordResetEvent with user and application url(front end root
-        // url which is used for resetting the password) which triggers the
-        // PasswordResetEventListener
-        publisher.publishEvent(new PasswordResetEvent(user, UserApiApplicationUrl));
+        // publishing a PasswordResetEvent with user, application url(front end root
+        // url which is used for resetting the password) and and
+        // getMailNoToUseForSendingEmail() contains the mail number from our mail
+        // providers to use for sending the email for resetting the password which
+        // triggers the PasswordResetEventListener
+        publisher.publishEvent(
+                new PasswordResetEvent(user, UserApiApplicationUrl, user.getMailNoToUseForSendingEmail()));
         // returning the string response to the user as "sent url to reset password
         // successfully"
         return ResponseEntity.ok("sent url to reset password successfully");

@@ -85,8 +85,10 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
             // receive an email
             String messageSubject = "Account verification email";
             // we are using our custom emailService class to send the email with the user's
-            // email address and the message subject and the message body
-            emailService.sendEmail(user.getEmail(), messageSubject, messageBody);
+            // email address and the message subject and the message body and also with the
+            // mailNoToUse variable as it contains the mail number from our mail providers
+            // to use for sending the email for verification
+            emailService.sendEmail(user.getEmail(), messageSubject, messageBody, event.getMailNoToUseForSendingEmail());
         } catch (UserNotFoundException e) {
             // if any error occurs we are printing the stackTrace
             e.printStackTrace();

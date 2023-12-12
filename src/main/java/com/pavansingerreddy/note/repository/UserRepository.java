@@ -3,6 +3,7 @@ package com.pavansingerreddy.note.repository;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,5 +28,34 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // database. If no such User exists, nothing happens.
     @Transactional
     void deleteByEmail(String userEmail);
+
+    // Here we are writing a native sql query.This query gets the latest signed up
+    // user who's mailNoToUseForSendingEmail has the lowest newUserCanBeCreatedAtTime
+
+    // 1. The subquery SELECT MAX(u2.new_user_can_be_created_at_time) FROM User u2
+    // GROUP BY
+    // u2.mail_no_to_use_for_sending_email gets the latest newUserCanBeCreatedAtTime
+    // for each mailNoToUseForSendingEmail.
+
+    // 2. The outer query SELECT u.* FROM User AS u WHERE
+    // u.new_user_can_be_created_at_time IN (...)
+    // gets the users with these latest newUserCanBeCreatedAtTime.
+
+    // 3. The final query SELECT u1.* FROM (...) AS u1 ORDER BY
+    // u1.new_user_can_be_created_at_time
+    // ASC LIMIT 1 gets the oldest user among these latest users.
+    @Query(value = """
+            SELECT u1.* FROM (\
+            SELECT u.* FROM user AS u \
+            WHERE u.new_user_can_be_created_at_time IN (\
+            SELECT MAX(u2.new_user_can_be_created_at_time) FROM user u2 GROUP BY u2.mail_no_to_use_for_sending_email\
+            )\
+            ) AS u1 \
+            ORDER BY u1.new_user_can_be_created_at_time ASC \
+            LIMIT 1\
+            """, nativeQuery = true)
+    Optional<User> findTheUserWhoContainsTheAppropriateEmailToSendSignUpUrl();
+
+    Optional<User> findByUsername(String dummyUsername1);
 
 }

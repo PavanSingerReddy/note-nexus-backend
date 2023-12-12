@@ -18,12 +18,17 @@ public class RegistrationCompleteEvent extends ApplicationEvent {
 
     private User user;
     private String applicationUrl;
+    private int mailNoToUseForSendingEmail;
 
-    //application url contains the root path or url of the frontend application and User object contains the details of the registered new user
-    public RegistrationCompleteEvent(User user, String applicationUrl) {
+    // application url contains the root path or url of the frontend application and
+    // User object contains the details of the registered new user and
+    // mailNoToUseForSendingEmail contains the mail number from our
+    // mail providers to use for sending the email for verification
+    public RegistrationCompleteEvent(User user, String applicationUrl, int mailNoToUseForSendingEmail) {
         super(user);
         this.user = user;
         this.applicationUrl = applicationUrl;
+        this.mailNoToUseForSendingEmail = mailNoToUseForSendingEmail;
     }
 
 }
