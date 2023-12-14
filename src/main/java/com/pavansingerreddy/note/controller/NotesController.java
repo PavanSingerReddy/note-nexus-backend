@@ -195,7 +195,7 @@ public class NotesController {
         // Call a method in noteService to search for notes associated with the user's
         // email and the search term. Return the list of NoteDto objects in the response
         // with a status of 200 OK.
-        return ResponseEntity.ok(noteService.searchNotes(userEmail, searchTerm));
+                return ResponseEntity.ok(noteService.searchNotes(userEmail, searchTerm));
 
     }
 

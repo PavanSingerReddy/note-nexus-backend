@@ -11,7 +11,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.entity.Users;
 import com.pavansingerreddy.note.repository.UserRepository;
 
 // Component annotation indicates that the class is a Spring component. Spring will automatically detect this class for dependency injection when component scanning is enabled.
@@ -60,8 +60,8 @@ public class DummyUserDetailsCreator implements ApplicationRunner {
         String dummyUsername2 = "dummyUser2";
 
         // Check if the dummy users already exist
-        Optional<User> existingUser1 = userRepository.findByUsername(dummyUsername1);
-        Optional<User> existingUser2 = userRepository.findByUsername(dummyUsername2);
+        Optional<Users> existingUser1 = userRepository.findByUsername(dummyUsername1);
+        Optional<Users> existingUser2 = userRepository.findByUsername(dummyUsername2);
 
         // This creates a User object, user1, and sets its username, password,
         // email, mailNoToUseForSendingEmail, newUserCanBeCreatedAtTime,
@@ -69,7 +69,7 @@ public class DummyUserDetailsCreator implements ApplicationRunner {
 
         // If dummy user1 doesn't exist, create it
         if (!existingUser1.isPresent()) {
-            User user1 = new User();
+            Users user1 = new Users();
             user1.setUsername(dummyUsername1);
             user1.setPassword(passwordEncoder.encode("password1"));
             user1.setEmail(fromEmail1);
@@ -87,7 +87,7 @@ public class DummyUserDetailsCreator implements ApplicationRunner {
             // This creates a User object, user2, and sets its username, password,
             // email, mailNoToUseForSendingEmail, newUserCanBeCreatedAtTime,
             // userCreatedAtTime
-            User user2 = new User();
+            Users user2 = new Users();
             user2.setUsername(dummyUsername2);
             user2.setPassword(passwordEncoder.encode("password2"));
             user2.setEmail(fromEmail2);

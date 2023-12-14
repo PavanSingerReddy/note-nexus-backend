@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
-import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.entity.Users;
 import com.pavansingerreddy.note.events.event_publisher.PasswordResetEvent;
 import com.pavansingerreddy.note.services.EmailService;
 import com.pavansingerreddy.note.services.UserService;
@@ -40,7 +40,7 @@ public class PasswordResetEventListener implements ApplicationListener<PasswordR
         // creating the password reset token for the user
 
         // getting the user object of the user who triggered this event
-        User user = event.getUser();
+        Users user = event.getUser();
         // generating a random uuid which is stored in my database and also sent to the
         // user's email in a query parameter url so that user can verify and reset the
         // password

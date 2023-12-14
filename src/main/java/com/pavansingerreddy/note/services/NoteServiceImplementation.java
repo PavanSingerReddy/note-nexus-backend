@@ -18,7 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.pavansingerreddy.note.dto.NoteDto;
 import com.pavansingerreddy.note.dto.PagableNoteDto;
 import com.pavansingerreddy.note.entity.Note;
-import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.entity.Users;
 import com.pavansingerreddy.note.exception.NoteDoesNotExistsException;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
 import com.pavansingerreddy.note.model.NoteModel;
@@ -57,7 +57,7 @@ public class NoteServiceImplementation implements NoteService {
         // want the optional user because it is easy to check if the
         // user exists or not and also it does not have null values in
         // it
-        Optional<User> user = userRepository.findByEmail(userEmail);
+        Optional<Users> user = userRepository.findByEmail(userEmail);
         // checking if the user is present or not if the user is present then we set the
         // user of the note to the user who's email is passed to us as the parameter and
         // then saving the note and after that returning the noteDto by converting note
@@ -87,7 +87,7 @@ public class NoteServiceImplementation implements NoteService {
         // want the optional User because it is easy to check if the
         // User exists or not and also it does not have null values in
         // it
-        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        Optional<Users> optionalUser = userRepository.findByEmail(userEmail);
 
         // if the note is present and the user is also present then it get's the note
         // and user from the optional note and optional user and after that it checks if
@@ -95,7 +95,7 @@ public class NoteServiceImplementation implements NoteService {
         if (optionalNote.isPresent() && optionalUser.isPresent()) {
 
             Note note = optionalNote.get();
-            User user = optionalUser.get();
+            Users user = optionalUser.get();
             // checks if the note's user id is equal to the given user's id
             if (note.getUser().getUserId() == user.getUserId()) {
                 // if the note is associated with the given user then we return the note Dto by
@@ -120,11 +120,11 @@ public class NoteServiceImplementation implements NoteService {
         // Call a method in userRepository to find the User object associated with the
         // email. The method returns an Optional, which can either contain the User
         // object (if found) or be empty (if not found).
-        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        Optional<Users> optionalUser = userRepository.findByEmail(userEmail);
         // Check if the Optional contains a User object.
         if (optionalUser.isPresent()) {
             // Get the User object from the Optional.
-            User user = optionalUser.get();
+            Users user = optionalUser.get();
             // Get the list of Note objects associated with the user.
             List<Note> notes = user.getNotes();
             // Check if the list of notes is not null.
@@ -161,14 +161,14 @@ public class NoteServiceImplementation implements NoteService {
         // want the optional User because it is easy to check if the
         // User exists or not and also it does not have null values in
         // it
-        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        Optional<Users> optionalUser = userRepository.findByEmail(userEmail);
 
         // if the note is present and the user is also present then it get's the note
         // and user from the optional note and optional user and after that it checks if
         // the note's user id is equal to the given user's id
         if (optionalNote.isPresent() && optionalUser.isPresent()) {
             Note note = optionalNote.get();
-            User user = optionalUser.get();
+            Users user = optionalUser.get();
             // checks if the note's user id is equal to the given user's id
             if (note.getUser().getUserId() == user.getUserId()) {
                 // if the note belongs to a particular user then we copy the details from note
@@ -200,13 +200,13 @@ public class NoteServiceImplementation implements NoteService {
         // want the optional User because it is easy to check if the
         // User exists or not and also it does not have null values in
         // it
-        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        Optional<Users> optionalUser = userRepository.findByEmail(userEmail);
         // if the note is present and the user is also present then it get's the note
         // and user from the optional note and optional user and after that it checks if
         // the note's user id is equal to the given user's id
         if (optionalNote.isPresent() && optionalUser.isPresent()) {
             Note note = optionalNote.get();
-            User user = optionalUser.get();
+            Users user = optionalUser.get();
             // checks if the note's user id is equal to the given user's id
             if (note.getUser().getUserId() == user.getUserId()) {
                 // if they match then we delete the associated note and return the deleted note
@@ -231,12 +231,12 @@ public class NoteServiceImplementation implements NoteService {
         // want the optional User because it is easy to check if the
         // User exists or not and also it does not have null values in
         // it
-        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        Optional<Users> optionalUser = userRepository.findByEmail(userEmail);
         // checks if the optional user is present or not
-        if (optionalUser.isPresent()) {
+                if (optionalUser.isPresent()) {
             // if the optional user is present then we get the user object from the optional
             // user
-            User user = optionalUser.get();
+            Users user = optionalUser.get();
             // we also get the user's id from the user's object
             Long userId = user.getUserId();
             // we search for the corresponding notes related to the given user id and the
@@ -275,11 +275,11 @@ public class NoteServiceImplementation implements NoteService {
         // Call a method in userRepository to find the User object associated with the
         // email.The method returns an Optional, which can either contain the User
         // object (if found) or be empty (if not found).
-        Optional<User> optionalUser = userRepository.findByEmail(userEmail);
+        Optional<Users> optionalUser = userRepository.findByEmail(userEmail);
         // Check if the Optional contains a User object.
         if (optionalUser.isPresent()) {
             // Get the User object from the Optional.
-            User user = optionalUser.get();
+            Users user = optionalUser.get();
             // Get the user's ID.
             Long userId = user.getUserId();
             // Create a Pageable object with the specified page number, size, and sort
