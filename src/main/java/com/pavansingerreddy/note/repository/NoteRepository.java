@@ -24,7 +24,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     // page request, such as the page number and size.
     Page<Note> findByUser_UserId(Long userId, Pageable pageable);
 
-    @Query("SELECT n FROM Note n WHERE n.user.userId = :userId AND (LOWER(CAST(n.title AS string)) LIKE LOWER(CONCAT('%', :term, '%')) OR LOWER(CAST(n.content AS string)) LIKE LOWER(CONCAT('%', :term, '%')))")
+    @Query("SELECT n FROM Note n WHERE n.user.userId = :userId AND (LOWER(n.title) LIKE LOWER(CONCAT('%', :term, '%')) OR LOWER(n.content) LIKE LOWER(CONCAT('%', :term, '%')))")
     // This method declaration is for searching for Note entities associated with a
     // specific user ID and a search term. The @Query annotation specifies the JPQL
     // query to be executed. The @Param annotations are used to bind the method
@@ -34,9 +34,8 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 }
 
 // NOTE: here is a break down of the above query : @Query("SELECT n FROM Note n
-// WHERE n.user.userId = :userId AND (LOWER(CAST(n.title AS string)) LIKE
-// LOWER(CONCAT('%', :term, '%')) OR LOWER(CAST(n.content AS string)) LIKE
-// LOWER(CONCAT('%', :term, '%')))")
+// WHERE n.user.userId = :userId AND (LOWER(n.title) LIKE LOWER(CONCAT('%',
+// :term, '%')) OR LOWER(n.content) LIKE LOWER(CONCAT('%', :term, '%')))")
 
 // explanation of the query :
 
@@ -48,16 +47,15 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 // field of the user field of the Note entity matches the userId parameter
 // provided in the method call.
 
-// LOWER(CAST(n.title AS string)) LIKE LOWER(CONCAT('%', :term, '%')): This is
-// another condition that filters the notes based on their title. It converts
-// the title of the note to a string and to lower case, and checks if it
-// contains the term parameter provided in the method call (also converted to
-// lower case). The % symbols are wildcards that allow for any characters before
-// or after the term.
+// LOWER(n.title) LIKE LOWER(CONCAT('%', :term, '%')): This condition checks if
+// the title of the note contains the search :term. The LOWER function is used
+// to make the search case-insensitive. The CONCAT function is used to add ‘%’
+// before and after the search term, which allows it to match any part of the
+// title.
 
-// LOWER(CAST(n.content AS string)) LIKE LOWER(CONCAT('%', :term, '%')): This is
-// similar to the previous condition, but it checks the content field of the
-// Note entity instead of the title.
+// LOWER(n.content) LIKE LOWER(CONCAT('%', :term, '%')): This condition is
+// similar to the previous one, but it checks the content of the note instead of
+// the title.
 
 // AND: This is a logical operator that requires both conditions on its sides to
 // be true. So a Note entity will only be selected if both the userId matches

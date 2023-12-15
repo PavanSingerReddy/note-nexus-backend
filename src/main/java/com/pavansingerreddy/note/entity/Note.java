@@ -12,7 +12,6 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -51,9 +50,6 @@ public class Note {
         @Column(columnDefinition = "TEXT")
         // This field holds the title of the note.
         private String title;
-        // This annotation specifies that a persistent property or field should be
-        // persisted as a large object to a database-supported large object type.
-        @Lob
         // This annotation is used to specify the mapped column for a persistent
         // property or field.
         @Column(columnDefinition = "LONGTEXT")
