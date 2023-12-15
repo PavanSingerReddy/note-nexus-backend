@@ -1,10 +1,12 @@
 package com.pavansingerreddy.note.config;
 
 import java.util.Arrays;
+import java.util.function.Consumer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.ResponseCookie.ResponseCookieBuilder;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
@@ -95,13 +97,54 @@ public class SecurityConfig {
     // should be registered as a bean in the Spring application context.
     @Bean
     public SecurityFilterChain loginAndRegisterSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+
+        // CookieCsrfTokenRepository is a type of CsrfTokenRepository which is used to
+        // manage the csrf token like getting the csrf cookie from the incoming http
+        // request and generating a new csrf Token(actually DeferredCsrfToken calls the
+        // "this.csrfTokenRepository.generateToken(this.request)" in it's init method if
+        // csrf token cookie is not present) if the csrf token cookie is not present in
+        // the incoming request etc
+        CookieCsrfTokenRepository tokenRepository = new CookieCsrfTokenRepository();
+        // using this setCookieCustomizer method we can set the properties of our csrf
+        // cookie which is sent to our front end from the backend.Consumer is a
+        // functional interface which has the "accept" method we have to override that
+        // method with our csrf token cookie properties.the Consumer functional
+        // interface here takes the ResponseCookieBuilder as an Argument
+        tokenRepository.setCookieCustomizer(new Consumer<ResponseCookieBuilder>() {
+
+            // here we override the accept method and specify the properties of the csrf
+            // token cookie which is going to be created and sent to our frontend client
+            // like react or angular
+            @Override
+            public void accept(ResponseCookieBuilder t) {
+                // un-comment below line if you want the csrf token cookie to have the same site
+                // attribute as none.But if it has same site as none then it should be secure
+                // also if it is not secure and same site is none then chrome browser will
+                // refuse to set the cookie
+
+                // t.sameSite("none");
+
+                // set the csrf token cookie as a secure cookie which is useful if we want our
+                // cookie to be accessible if the site is on https only.here it is set to false
+                // means this cookie is accessible on non secure sites like http also
+                t.secure(false);
+                // http only property of the csrf ensures that the cookie is not accessible by
+                // the javascript running in the browser but will be sent with each request as a
+                // cookie.here we are setting it to false because we want our frontend
+                // application to access this cookie and set the "X-Xsrf-Token" http header with
+                // our csrf token value
+                t.httpOnly(false);
+            }
+
+        });
         // httpSecurity is the HttpSecurity instance that we're configuring based on our
         // needs.
         return httpSecurity
                 // Configuring Cross-Site Request Forgery (CSRF) protection.
                 .csrf((csrf) -> csrf
-                        // Using a CSRF token repository that stores the CSRF token in a cookie.
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        // Using a CSRF token repository(tokenRepository is a object of
+                        // CookieCsrfTokenRepository) that stores the CSRF token in a cookie.
+                        .csrfTokenRepository(tokenRepository)
                         // Using a custom CSRF token request handler which resolves the csrf token
                         // provided by the client.The csrf token will be generally included in the
                         // request header from the client when we use single page applications like
