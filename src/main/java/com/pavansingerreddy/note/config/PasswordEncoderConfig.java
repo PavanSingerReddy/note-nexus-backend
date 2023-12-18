@@ -15,7 +15,7 @@ public class PasswordEncoderConfig {
     @Bean
     // method returns a password encoder of our choice here in this case we are
     // returning BCryptPasswordEncoder as it also implements the PasswordEncoder
-    public PasswordEncoder getBCryptPasswordEncoder() {
+    PasswordEncoder getBCryptPasswordEncoder() {
         // This line creates a new BCryptPasswordEncoder object. BCryptPasswordEncoder
         // is a password encoder that uses the BCrypt strong hashing function
         return new BCryptPasswordEncoder();

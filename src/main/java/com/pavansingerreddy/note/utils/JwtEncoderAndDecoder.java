@@ -39,7 +39,7 @@ public class JwtEncoderAndDecoder {
     // be managed by the Spring container.
     @Bean
     // This method returns a JwtDecoder object.
-    public JwtDecoder jwtDecoder() {
+    JwtDecoder jwtDecoder() {
         // It builds a JwtDecoder using the public key.
         return NimbusJwtDecoder.withPublicKey(publicKey).build();
     }
@@ -48,7 +48,7 @@ public class JwtEncoderAndDecoder {
     // be managed by the Spring container.
     @Bean
     // This method returns a JwtEncoder object.
-    public JwtEncoder jwtEncoder() {
+    JwtEncoder jwtEncoder() {
         // It builds a JWK (JSON Web Key) using the public and private keys.
         JWK jwk = new RSAKey.Builder(publicKey).privateKey(privateKey).build();
         // It creates a JWKSource from the JWK.

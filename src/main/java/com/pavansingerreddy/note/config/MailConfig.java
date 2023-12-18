@@ -35,7 +35,7 @@ public class MailConfig {
     @Qualifier("mailSender1")
     // This declares a bean of type JavaMailSender with the qualifier “mailSender1”.
     // This method will provide the actual bean when requested.
-    public JavaMailSender getJavaMailSender1() {
+    JavaMailSender getJavaMailSender1() {
         // This creates a new instance of JavaMailSenderImpl, which is an implementation
         // of the JavaMailSender interface.
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
@@ -67,7 +67,7 @@ public class MailConfig {
     // etc.).
     @Bean
     @Qualifier("mailSender2")
-    public JavaMailSender getJavaMailSender2() {
+    JavaMailSender getJavaMailSender2() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(env.getProperty("mail.config2.host"));
         mailSender.setPort(Integer.parseInt(env.getProperty("mail.config2.port")));

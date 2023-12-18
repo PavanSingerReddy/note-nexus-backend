@@ -89,14 +89,14 @@ public class SecurityConfig {
     // new ProviderManager (which is a concrete implementation of
     // AuthenticationManager) with jwtAuthenticationProvider as its only
     // AuthenticationProvider
-    public AuthenticationManager authenticationManager() {
+    AuthenticationManager authenticationManager() {
         return new ProviderManager(jwtAuthenticationProvider);
     }
 
     // Bean annotation tells Spring that the method will return an object that
     // should be registered as a bean in the Spring application context.
     @Bean
-    public SecurityFilterChain loginAndRegisterSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    SecurityFilterChain loginAndRegisterSecurityFilterChain(HttpSecurity httpSecurity) throws Exception {
 
         // CookieCsrfTokenRepository is a type of CsrfTokenRepository which is used to
         // manage the csrf token like getting the csrf cookie from the incoming http
