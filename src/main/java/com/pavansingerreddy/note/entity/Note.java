@@ -52,7 +52,7 @@ public class Note {
         private String title;
         // This annotation is used to specify the mapped column for a persistent
         // property or field.
-        @Column(columnDefinition = "LONGTEXT")
+        @Column(columnDefinition = "TEXT")
         // This field holds the content of the note.
         private String content;
         // This field holds the date when the note was created.
@@ -74,7 +74,7 @@ public class Note {
                         // This specifies that the column cannot have null values.
                         nullable = false)
         // This field holds the user associated with the note.
-        private User user;
+        private Users user;
 
 }
 

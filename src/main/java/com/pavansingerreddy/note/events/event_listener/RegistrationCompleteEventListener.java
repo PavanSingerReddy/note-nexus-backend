@@ -8,7 +8,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.entity.Users;
 import com.pavansingerreddy.note.events.event_publisher.RegistrationCompleteEvent;
 import com.pavansingerreddy.note.exception.UserNotFoundException;
 import com.pavansingerreddy.note.services.EmailService;
@@ -62,7 +62,7 @@ public class RegistrationCompleteEventListener implements ApplicationListener<Re
             // the previous user object the hibernate session is discontinued and we get
             // the error as "detached entity passed to persist" this is the reason we are
             // fetching the user details again in this new hibernate session
-            User user = userService.getUserDetailsByEmail(event.getUser().getEmail());
+            Users user = userService.getUserDetailsByEmail(event.getUser().getEmail());
             // we are creating a random uuid string so that it can be used as a verification
             // token
             String token = UUID.randomUUID().toString();

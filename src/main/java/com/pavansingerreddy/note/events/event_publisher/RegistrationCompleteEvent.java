@@ -2,7 +2,7 @@ package com.pavansingerreddy.note.events.event_publisher;
 
 import org.springframework.context.ApplicationEvent;
 
-import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.entity.Users;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,7 +16,7 @@ import lombok.Setter;
 // user successfully we trigger or publish this event
 public class RegistrationCompleteEvent extends ApplicationEvent {
 
-    private User user;
+    private Users user;
     private String applicationUrl;
     private int mailNoToUseForSendingEmail;
 
@@ -24,7 +24,7 @@ public class RegistrationCompleteEvent extends ApplicationEvent {
     // User object contains the details of the registered new user and
     // mailNoToUseForSendingEmail contains the mail number from our
     // mail providers to use for sending the email for verification
-    public RegistrationCompleteEvent(User user, String applicationUrl, int mailNoToUseForSendingEmail) {
+    public RegistrationCompleteEvent(Users user, String applicationUrl, int mailNoToUseForSendingEmail) {
         super(user);
         this.user = user;
         this.applicationUrl = applicationUrl;

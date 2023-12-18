@@ -22,7 +22,7 @@ import org.springframework.stereotype.Service;
 import com.pavansingerreddy.note.dto.UserDto;
 import com.pavansingerreddy.note.entity.PasswordResetToken;
 import com.pavansingerreddy.note.entity.Role;
-import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.entity.Users;
 import com.pavansingerreddy.note.entity.VerificationToken;
 import com.pavansingerreddy.note.exception.InvalidUserDetailsException;
 import com.pavansingerreddy.note.exception.PasswordDoesNotMatchException;
@@ -88,13 +88,13 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     // This method is used to create user when the user get's registered or signs up
-    public User createUser(UserModel userModel, int mailNoToUse)
+    public Users createUser(UserModel userModel, int mailNoToUse)
             throws UserAlreadyExistsException, PasswordDoesNotMatchException {
 
         // findByEmail method of user repository gives us the user object from the
         // user's email.findByEmail method returns optional User because it is not null
         // and we can check if the use is present or not easily
-        Optional<User> userOptional = userRepository.findByEmail(userModel.getEmail());
+        Optional<Users> userOptional = userRepository.findByEmail(userModel.getEmail());
 
         // checks if the password and retyped password matches and also checks if the
         // user is not already present in the database
@@ -114,7 +114,7 @@ public class UserServiceImplementation implements UserService {
                 userRepository.delete(userOptional.get());
             }
             // creating the new User object
-            User user = new User();
+            Users user = new Users();
             // copying the details of the user from the user model to the user using the in
             // Built BeanUtils class and using it's copyProperties
             BeanUtils.copyProperties(userModel, user);
@@ -165,15 +165,15 @@ public class UserServiceImplementation implements UserService {
 
     @Override
     // This method is used to get the user details by his/her email address
-    public User getUserDetailsByEmail(String userEmail) throws UserNotFoundException {
+    public Users getUserDetailsByEmail(String userEmail) throws UserNotFoundException {
         // it get's the optional user from the userRepository we want Optional user
         // because it is easy to check if the user is present or not and it does not
         // contains null
-        Optional<User> userOptional = userRepository.findByEmail(userEmail);
+        Optional<Users> userOptional = userRepository.findByEmail(userEmail);
 
         // if the user is present then we get the user and return the user
         if (userOptional.isPresent()) {
-            User user = userOptional.get();
+            Users user = userOptional.get();
             return user;
         }
         // if the user is not present then we throw the UserNotFoundException
@@ -191,11 +191,11 @@ public class UserServiceImplementation implements UserService {
         // Call a method in userRepository to find the User object associated with the
         // email. The method returns an Optional, which can either contain the User
         // object (if found) or be empty (if not found).
-        Optional<User> userOptional = userRepository.findByEmail(userEmail);
+        Optional<Users> userOptional = userRepository.findByEmail(userEmail);
         // Check if the Optional contains a User object.
         if (userOptional.isPresent()) {
             // Get the User object from the Optional.
-            User user = userOptional.get();
+            Users user = userOptional.get();
             // If the NormalUserModel object contains a non-empty email, update the user's
             // email.
             if (normalUserModel.getEmail() != null && !normalUserModel.getEmail().isEmpty()) {
@@ -231,11 +231,11 @@ public class UserServiceImplementation implements UserService {
         // Call a method in userRepository to find the User object associated with the
         // email.The method returns an Optional, which can either contain the User
         // object (if found) or be empty (if not found).
-        Optional<User> userOptional = userRepository.findByEmail(userEmail);
+        Optional<Users> userOptional = userRepository.findByEmail(userEmail);
         // Check if the Optional contains a User object.
         if (userOptional.isPresent()) {
             // Get the User object from the Optional.
-            User user = userOptional.get();
+            Users user = userOptional.get();
             // Call a method in userRepository to delete the User object associated with the
             // email.
             userRepository.deleteByEmail(userEmail);
@@ -277,7 +277,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     // This method takes the random unique UUID as a verification token and the User
     // object and links the verification token to a particular user
-    public void saveVerificationTokenForUser(String token, User user) {
+    public void saveVerificationTokenForUser(String token, Users user) {
 
         // creating a new verification token object the token string ,User object and
         // the Token expire time in seconds which we get from the application.yml file
@@ -302,7 +302,7 @@ public class UserServiceImplementation implements UserService {
         }
 
         // we are getting the User from the Verification token
-        User user = verificationToken.getUser();
+        Users user = verificationToken.getUser();
         // we are getting the calendar instance from the Calendar.getInstance() method
         Calendar cal = Calendar.getInstance();
 
@@ -348,7 +348,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     // deleting the previous verification token if it exists it takes the user
     // object as it's parameter
-    public void deletePreviousTokenIfExists(User user) {
+    public void deletePreviousTokenIfExists(Users user) {
 
         // getting the optional verification token based on the User object. we want the
         // optional verification token because it is easy to check if the verification
@@ -373,7 +373,7 @@ public class UserServiceImplementation implements UserService {
     @Override
     // deletes the previous password reset token for a user if the token already
     // exists it takes the user object as a parameter
-    public void deletePreviousPasswordResetTokenIfExists(User user) {
+    public void deletePreviousPasswordResetTokenIfExists(Users user) {
 
         // getting the optional password reset token based on the User object. we want
         // the optional password reset token because it is easy to check if the
@@ -390,7 +390,7 @@ public class UserServiceImplementation implements UserService {
     // The method takes the random UUID token and the user object and saves the
     // password reset token in the database with that user id
     @Override
-    public void savePasswordResetToken(String token, User user) {
+    public void savePasswordResetToken(String token, Users user) {
         // calling the constructor of the PasswordResetToken entity which set's the user
         // ,token, and Token expiry time in the PasswordResetToken
         PasswordResetToken passwordResetToken = new PasswordResetToken(user, token, TokenExpireTimeInSeconds);
@@ -404,7 +404,7 @@ public class UserServiceImplementation implements UserService {
     // This method takes the UUID token which came as a query parameter with the url
     // and checks if the token exists and is not expired and returns the user
     // associated with the token
-    public User validatePasswordResetToken(String token) throws InvalidUserDetailsException {
+    public Users validatePasswordResetToken(String token) throws InvalidUserDetailsException {
         // getting the passwordResetToken token from the database
         PasswordResetToken passwordResetToken = passwordResetTokenRepository.findByToken(token);
         // if the token does not exists we are throwing an exception
@@ -415,7 +415,7 @@ public class UserServiceImplementation implements UserService {
         // getting the calendar instance to get the current time
         Calendar cal = Calendar.getInstance();
         // getting the user object to which the password reset token is associated to
-        User user = passwordResetToken.getUser();
+        Users user = passwordResetToken.getUser();
 
         // if the user does not exists then we are throwing exception.This case
         // generally does not occur but we are specifying here just for the safety
@@ -438,7 +438,7 @@ public class UserServiceImplementation implements UserService {
     // then checking if the newpassword and retypednewpassword matches and if they
     // both matches then we are setting the new password of the user
     @Override
-    public String resetPassword(User user, ResetPasswordModel resetPasswordModel) throws InvalidUserDetailsException {
+    public String resetPassword(Users user, ResetPasswordModel resetPasswordModel) throws InvalidUserDetailsException {
         // checking if the newpassword and retypednewpassword matches if they match then
         // we save the newpassword to the database else we throw an exception
         if (resetPasswordModel.ValidatePasswordAndRetypedPassword()) {
@@ -459,7 +459,7 @@ public class UserServiceImplementation implements UserService {
     // user object and the change password model which is given to us by the user
     // and it contains old password , new password and retyped new password
     @Override
-    public String changePassword(User user, @Valid ChangePasswordModel changePasswordModel)
+    public String changePassword(Users user, @Valid ChangePasswordModel changePasswordModel)
             throws InvalidUserDetailsException {
 
         // checking if the old password which the user sent and the password in the
@@ -509,7 +509,7 @@ public class UserServiceImplementation implements UserService {
         // This findTheUserWhoContainsTheAppropriateEmailToSendSignUpUrl() gets the
         // latest signed up user who's mailNoToUseForSendingEmail has the lowest
         // newUserCanBeCreatedAtTime
-        Optional<User> userOptional = userRepository.findTheUserWhoContainsTheAppropriateEmailToSendSignUpUrl();
+        Optional<Users> userOptional = userRepository.findTheUserWhoContainsTheAppropriateEmailToSendSignUpUrl();
         // if any user is present then we get the user and check if the
         // getNewUserCanBeCreatedAtTime for that user is greater than the current time
         // if it is greater then we throw an InvalidUserDetailsException else we return
@@ -517,7 +517,7 @@ public class UserServiceImplementation implements UserService {
         // least one email provider to send emails
         if (userOptional.isPresent()) {
             // getting the user from the optional user
-            User user = userOptional.get();
+            Users user = userOptional.get();
             // getting the current date
             Date currentDate = Date.from(Instant.now());
             // user.getNewUserCanBeCreatedAtTime().compareTo(currentDate) returns 0 if the

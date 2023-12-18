@@ -7,14 +7,14 @@ import com.pavansingerreddy.note.dto.NoteDto;
 import com.pavansingerreddy.note.dto.PagableNoteDto;
 import com.pavansingerreddy.note.dto.UserDto;
 import com.pavansingerreddy.note.entity.Note;
-import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.entity.Users;
 import com.pavansingerreddy.note.model.NoteModel;
 
 // This is a utility class which is used for converting the original entity to it's DTO
 public class DTOConversionUtil {
 
     // This method converts a User object to a UserDto object.
-    public static UserDto userToUserDTO(User user) {
+    public static UserDto userToUserDTO(Users user) {
         // Create a new UserDto object.
         UserDto userDto = new UserDto();
         // Set the username in the UserDto. If the username in the User is null, set it

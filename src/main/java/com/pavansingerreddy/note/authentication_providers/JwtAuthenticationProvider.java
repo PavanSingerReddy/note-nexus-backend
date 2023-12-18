@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.entity.Users;
 
 // declaring it as a component so spring can create beans of this custom filter
 @Component
@@ -53,7 +53,7 @@ public class JwtAuthenticationProvider implements AuthenticationProvider {
         // creating a new user object so that we can copy user details from userDetails
         // to user as userDetails is not accepting the userDetails.getEmail() method in
         // the below usernamePasswordAuthenticationToken
-        User user = new User();
+        Users user = new Users();
         // copying properties from userDetails to user
         BeanUtils.copyProperties(userDetails, user);
 

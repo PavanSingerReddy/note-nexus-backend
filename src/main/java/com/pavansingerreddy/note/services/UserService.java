@@ -3,7 +3,7 @@ package com.pavansingerreddy.note.services;
 import java.util.Map;
 
 import com.pavansingerreddy.note.dto.UserDto;
-import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.entity.Users;
 import com.pavansingerreddy.note.exception.InvalidUserDetailsException;
 import com.pavansingerreddy.note.exception.PasswordDoesNotMatchException;
 import com.pavansingerreddy.note.exception.UserAlreadyExistsException;
@@ -17,9 +17,9 @@ import jakarta.validation.Valid;
 
 public interface UserService {
 
-    User createUser(UserModel userModel,int mailNoToUse) throws UserAlreadyExistsException,PasswordDoesNotMatchException;
+    Users createUser(UserModel userModel,int mailNoToUse) throws UserAlreadyExistsException,PasswordDoesNotMatchException;
 
-    User getUserDetailsByEmail(String userEmail) throws UserNotFoundException;
+    Users getUserDetailsByEmail(String userEmail) throws UserNotFoundException;
 
     UserDto updateUserInformationByEmail(String userEmail,NormalUserModel normalUserModel) throws UserNotFoundException;
 
@@ -27,21 +27,21 @@ public interface UserService {
 
     Map<String,String> loginUser(NormalUserModel normalUserModel);
 
-    void saveVerificationTokenForUser(String token, User user);
+    void saveVerificationTokenForUser(String token, Users user);
 
     boolean validateVerificationToken(String token);
 
-    void deletePreviousTokenIfExists(User user);
+    void deletePreviousTokenIfExists(Users user);
 
-    void deletePreviousPasswordResetTokenIfExists(User user);
+    void deletePreviousPasswordResetTokenIfExists(Users user);
 
-    void savePasswordResetToken(String token, User user);
+    void savePasswordResetToken(String token, Users user);
 
-    User validatePasswordResetToken(String token) throws InvalidUserDetailsException;
+    Users validatePasswordResetToken(String token) throws InvalidUserDetailsException;
 
-    String resetPassword(User user, ResetPasswordModel resetPasswordModel) throws InvalidUserDetailsException;
+    String resetPassword(Users user, ResetPasswordModel resetPasswordModel) throws InvalidUserDetailsException;
 
-    String changePassword(User user, @Valid ChangePasswordModel changePasswordModel) throws InvalidUserDetailsException;
+    String changePassword(Users user, @Valid ChangePasswordModel changePasswordModel) throws InvalidUserDetailsException;
 
     void deletePasswordResetToken(String token) throws InvalidUserDetailsException;
 

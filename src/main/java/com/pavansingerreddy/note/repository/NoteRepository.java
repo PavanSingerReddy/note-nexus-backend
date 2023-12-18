@@ -28,9 +28,9 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     // This method declaration is for searching for Note entities associated with a
     // specific user ID and a search term. The @Query annotation specifies the JPQL
     // query to be executed. The @Param annotations are used to bind the method
-    // parameters to the query parameters.
+    // parameters to the query parameters. List<Note> search(@Param("userId") Long
+    // userId, @Param("term") String term);
     List<Note> search(@Param("userId") Long userId, @Param("term") String term);
-
 }
 
 // NOTE: here is a break down of the above query : @Query("SELECT n FROM Note n

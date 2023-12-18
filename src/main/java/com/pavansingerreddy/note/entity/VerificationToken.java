@@ -60,12 +60,12 @@ public class VerificationToken {
     // foreign key is named "FK_USER_VERIFICATION_TOKEN".
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "FK_USER_VERIFICATION_TOKEN"))
     // user field holds the user associated with the verification token.
-    private User user;
+    private Users user;
 
     // This constructor takes a user, a token, and an expiration time in seconds as
     // parameters.and calculates the expiration time and assigns it to the
     // VerificationTokenExpireTimeInSeconds attribute of this Table
-    public VerificationToken(User user, String token, Long verificationTokenExpireTimeInSeconds) {
+    public VerificationToken(Users user, String token, Long verificationTokenExpireTimeInSeconds) {
         // Set the token.
         this.token = token;
         // Set the user.

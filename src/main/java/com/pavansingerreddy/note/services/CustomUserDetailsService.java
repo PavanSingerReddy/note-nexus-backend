@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.entity.Users;
 import com.pavansingerreddy.note.repository.UserRepository;
 
 // Service annotation is used in this code to indicate that Spring should automatically detect this as a service class.
@@ -50,7 +50,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         // This line calls the findByEmail method of the UserRepository to find a user
         // by their email. The result is wrapped in an Optional.
-        Optional<User> userDetails = userRepository.findByEmail(email);
+        Optional<Users> userDetails = userRepository.findByEmail(email);
         // This checks if the Optional contains a User.
         if (userDetails.isPresent()) {
             // If the Optional contains a User, it returns the User.

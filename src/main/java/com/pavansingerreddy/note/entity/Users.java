@@ -53,7 +53,7 @@ import lombok.ToString;
 // This class implements the UserDetails interface, which means it can be used
 // to represent a user in the Spring Security framework and it is used by the
 // UserDetailsService to load the user details for the Authentication provider.
-public class User implements UserDetails {
+public class Users implements UserDetails {
     // Id annotation specifies the primary key of an entity.
     @Id
     // GeneratedValue annotation provides for the specification of generation

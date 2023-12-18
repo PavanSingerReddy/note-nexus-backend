@@ -22,7 +22,7 @@
   {
     "name": "frontend.applicationUrl.user.api",
     "type": "java.lang.String",
-    "description": "User api url"
+    "description": "Users api url"
   },
   {
     "name": "mail.config1.host",

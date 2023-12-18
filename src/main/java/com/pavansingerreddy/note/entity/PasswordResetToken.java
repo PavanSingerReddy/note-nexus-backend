@@ -53,11 +53,11 @@ public class PasswordResetToken {
     // defined with the Id annotation as it's foreign key
     @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "FK_USER_PASSWORD_RESET_TOKEN"))
     // This field holds the user associated with the password reset token.
-    private User user;
+    private Users user;
 
     // constructor for password reset token which takes User object and a UUID token
     // string and a password expiry time in seconds
-    public PasswordResetToken(User user, String token, Long PasswordResetTokenExpireTimeInSeconds) {
+    public PasswordResetToken(Users user, String token, Long PasswordResetTokenExpireTimeInSeconds) {
         // Set the token.
         this.token = token;
         // Set the user.

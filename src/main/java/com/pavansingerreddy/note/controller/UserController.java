@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.pavansingerreddy.note.dto.UserDto;
-import com.pavansingerreddy.note.entity.User;
+import com.pavansingerreddy.note.entity.Users;
 import com.pavansingerreddy.note.events.event_publisher.PasswordResetEvent;
 import com.pavansingerreddy.note.events.event_publisher.RegistrationCompleteEvent;
 import com.pavansingerreddy.note.exception.InvalidUserDetailsException;
@@ -149,7 +149,7 @@ public class UserController {
         // not enabled then it deletes the previous user and creates a new user.if the
         // user is not present then it creates a new user with the details provided by
         // the userModel and the mailNoToUse variable
-        User user = userService.createUser(userModel, mailNoToUse);
+        Users user = userService.createUser(userModel, mailNoToUse);
         // publishing a new RegistrationCompleteEvent which send's the event for sending
         // an email for the registered user with the verification token.We are using
         // event here as sending an email for the user is a separate task from the main
@@ -203,7 +203,7 @@ public class UserController {
         // getting the email from the password model
         String email = passwordModel.getEmail();
         // getting the user details by his/her email address.
-        User user = userService.getUserDetailsByEmail(email);
+        Users user = userService.getUserDetailsByEmail(email);
         // checking if the user is enabled or not
         boolean isUserEnabled = user.isEnabled();
         // if the user is already enabled then we are throwing exception as "User is
@@ -239,7 +239,7 @@ public class UserController {
             throws UserNotFoundException, InvalidUserDetailsException {
         // userService.getUserDetailsByEmail() returns the user object with their email
         // id
-        User user = userService.getUserDetailsByEmail(passwordModel.getEmail());
+        Users user = userService.getUserDetailsByEmail(passwordModel.getEmail());
         // checking if the user is enabled or not if the user is not enabled then we
         // throw the exception as "User is not verified.Verify the user first"
         if (!user.isEnabled()) {
@@ -274,7 +274,7 @@ public class UserController {
         // associated with that password reset token also exists then it checks if the
         // token is expired or not if the token is not expired then we get the user
         // associated with that token
-        User user = userService.validatePasswordResetToken(token);
+        Users user = userService.validatePasswordResetToken(token);
         // if the user is null then we are returning false as the user is not present
         if (user == null) {
             // returning the response as false as the user associated with the token is not
@@ -297,7 +297,7 @@ public class UserController {
             @RequestBody @Valid ResetPasswordModel resetPasswordModel) throws InvalidUserDetailsException {
         // The validatePasswordResetToken checks if the token is valid and not expired
         // and returns the user associated with the token
-        User user = userService.validatePasswordResetToken(token);
+        Users user = userService.validatePasswordResetToken(token);
 
         // deleting the password reset token after verifying it
         userService.deletePasswordResetToken(token);
@@ -327,7 +327,7 @@ public class UserController {
         // using that email details
         String email = principal.getName();
         // get's the user object from the user's email address
-        User user = userService.getUserDetailsByEmail(email);
+        Users user = userService.getUserDetailsByEmail(email);
         // userService.changePassword() takes the user object and change password model
         // as parameters and it compares the old password given by the change password
         // model and the user's password from the database if they both match then it
@@ -394,7 +394,7 @@ public class UserController {
         String userEmail = principal.getName();
         // Call a method in userService to get the User object associated with the
         // email.
-        User user = userService.getUserDetailsByEmail(userEmail);
+        Users user = userService.getUserDetailsByEmail(userEmail);
         // Convert the User object to a UserDto object using a utility method in
         // DTOConversionUtil. Return the UserDto object in the response with a status of
         // 200 OK.
