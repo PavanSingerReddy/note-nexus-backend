@@ -224,8 +224,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // below line is commented out. If uncommented, it would allow all origins.
         // configuration.setAllowedOrigin(Arrays.asList("*"));
-        // This allows all origins using a wildcard "*".
-        configuration.setAllowedOriginPatterns(Arrays.asList("*"));
+        // This allows pavansingerreddy.tech and pavansingerreddy.me and all it's sub domains.
+        configuration.setAllowedOriginPatterns(Arrays.asList("http://*pavansingerreddy.tech","http://*pavansingerreddy.me"));
         // This sets the allowed HTTP methods.
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         // This sets the allowed HTTP headers.
