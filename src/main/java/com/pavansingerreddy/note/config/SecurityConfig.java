@@ -125,9 +125,9 @@ public class SecurityConfig {
                 // t.sameSite("none");
 
                 // set the csrf token cookie as a secure cookie which is useful if we want our
-                // cookie to be accessible if the site is on https only.here it is set to false
-                // means this cookie is accessible on non secure sites like http also
-                t.secure(false);
+                // cookie to be accessible if the site is on https only.here it is set to true
+                // means this cookie is accessible only on secure sites like https
+                t.secure(true);
                 // http only property of the csrf ensures that the cookie is not accessible by
                 // the javascript running in the browser but will be sent with each request as a
                 // cookie.here we are setting it to false because we want our frontend
@@ -225,7 +225,7 @@ public class SecurityConfig {
         // below line is commented out. If uncommented, it would allow all origins.
         // configuration.setAllowedOrigin(Arrays.asList("*"));
         // This allows pavansingerreddy.tech and pavansingerreddy.me and all it's sub domains.
-        configuration.setAllowedOriginPatterns(Arrays.asList("http://*pavansingerreddy.tech","http://*pavansingerreddy.me"));
+        configuration.setAllowedOriginPatterns(Arrays.asList("https://*pavansingerreddy.tech","https://*pavansingerreddy.me"));
         // This sets the allowed HTTP methods.
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         // This sets the allowed HTTP headers.

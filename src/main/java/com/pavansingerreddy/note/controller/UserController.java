@@ -359,8 +359,8 @@ public class UserController {
                 // The cookie is marked as HttpOnly for security (it's not accessible via
                 // JavaScript).
                 .httpOnly(true)
-                // Uncomment this line if you want the cookie to be sent only over HTTPS.
-                // .secure(true)
+                // cookie will be sent only over HTTPS if the secure parameter is true
+                .secure(true)
                 // The cookie will only be sent in a first-party context and not be sent along
                 // with requests initiated by third party websites.
                 .sameSite("strict")
