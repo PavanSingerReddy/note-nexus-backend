@@ -22,7 +22,7 @@ verification:
 frontend:
   applicationUrl:
     user:
-      api: http://pavansingerreddy.tech
+      api: https://pavansingerreddy.tech
 # data related to the public key private key and the expiry time of the jwt in seconds from when the jwt is first issued
 jwt:
   public:

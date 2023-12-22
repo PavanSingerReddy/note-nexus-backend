@@ -124,6 +124,21 @@ public class SecurityConfig {
 
                 // t.sameSite("none");
 
+                // setting our domain of our cookie such that it is accessible from our sub
+                // domain also because by default it set's the csrf cookie to the main domain
+                // "pavansingerreddy.tech" so we cannot access these cookies from our subdomain
+                // using javascript on the client side.we are modifying the domain name to
+                // include "." at the beginning of the main domain name like
+                // ".pavansingerreddy.tech" so the cookie will be accessible from the
+                // sub-domains of this site too using javascript.so this csrf cookie is
+                // avaliable both to the "pavansingerreddy.tech" domain and also it's sub
+                // domains too
+
+                // NOTE : every subdomain request also includes the cookie of it's main domain like csrf but the main domain cookie won't be accessible by the sub-domain's javascript client
+
+                //we want our csrf cookie to be accessible by the client's javascript because we will be sending this csrf token as a x-xsrf-token http header from the client side to validate the request
+                t.domain(".pavansingerreddy.tech");
+
                 // set the csrf token cookie as a secure cookie which is useful if we want our
                 // cookie to be accessible if the site is on https only.here it is set to true
                 // means this cookie is accessible only on secure sites like https
@@ -224,8 +239,10 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // below line is commented out. If uncommented, it would allow all origins.
         // configuration.setAllowedOrigin(Arrays.asList("*"));
-        // This allows pavansingerreddy.tech and pavansingerreddy.me and all it's sub domains.
-        configuration.setAllowedOriginPatterns(Arrays.asList("https://*pavansingerreddy.tech","https://*pavansingerreddy.me"));
+        // This allows pavansingerreddy.tech and pavansingerreddy.me and all it's sub
+        // domains.
+        configuration.setAllowedOriginPatterns(
+                Arrays.asList("https://*pavansingerreddy.tech", "https://*pavansingerreddy.me"));
         // This sets the allowed HTTP methods.
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         // This sets the allowed HTTP headers.

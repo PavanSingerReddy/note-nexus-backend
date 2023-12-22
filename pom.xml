@@ -29,6 +29,18 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<!-- exclude or remove tomcat server from the spring-boot-starter-web as tomcat's cookie parser does not allow us to set "Domain" value of the cookie to subdomain which include pattern like ".ourdomain.com" it only allows us to set our cookie to domains like "ourdomain.com" so we cannot access our main domain cookies from our subdomain using javascript that's why we are removing tomcat and replacing it with jetty server in the below dependency-->
+			<exclusions>
+				<exclusion>
+					<groupId>org.springframework.boot</groupId>
+					<artifactId>spring-boot-starter-tomcat</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		<!-- adding jetty server as dependency for running our application and we have replaced tomcat server with the below jetty server  -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-jetty</artifactId>
 		</dependency>
 
 		<dependency>
