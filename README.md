@@ -1,8 +1,8 @@
-# Note Taking Application Backend (Java Spring Boot)
+# Note Nexus Application Backend (Java Spring Boot)
 
 Fuel your note-taking experience with a powerful and secure backend!
 
-Notes App Backend (Java Spring Boot)
+Notes Nexus App Backend (Java Spring Boot)
 Fuel your note-taking experience with a powerful and secure backend!
 
 This Spring Boot application provides the API backbone for the Notes App, enabling seamless note management through RESTful APIs.
@@ -39,7 +39,7 @@ git clone https://github.com/PavanSingerReddy/note-nexus-backend
 
 2. **Navigate to the project directory :**
 ```
-cd notes-taking-backend\
+cd note-nexus-backend\
 ```
 
 3. **Install dependencies :**
@@ -55,22 +55,22 @@ mvn install
 
 - now after adding the database credentials change the application.yml file and change spring>profiles>active property if you are using mysql then change the property name to mysql or if you are using postgresql then change the property name to postgresql.
 
-- edit the host, username, password properties of the mail config properties in the application.yml file with the host property configured to the smtp server property and username property with the username and password property with the app password of the email.This email will be used to send the confirmation email for verifying the user account
+- edit the host, username, password properties of the mail config properties in the application.yml file with the host property configured to the smtp server address of the mail provider like `smtp-mail.outlook.com` for outlook and `smtp.gmail.com` for gmail and username property with the username and password property with the app password of the email.This email will be used to send the confirmation email for verifying the user account
 
 5. **Start the server :**
 
     **IntelliJ IDEA :**
     - Open the project in IntelliJ IDEA.
-    - Run the main class in com.pavansingerreddy.note.NotesTakingBackendApplication.java.
+    - Run the main class in `com.pavansingerreddy.note.NotesTakingBackendApplication.java`.
 
     **VSCode :**
     - Open a terminal in VSCode within the project directory.
-    - Run mvn spring-boot:run.
+    - Run `mvn spring-boot:run`.
 
 
 6. **Start the frontend of the application :**
 
-    After starting the backend server, you can start the frontend React application. The frontend application repository is here.
+    After starting the backend server, you can start the frontend React application. The frontend application repository is : https://github.com/PavanSingerReddy/note-nexus-frontend
 
     You can access the whole application live at https://pavansingerreddy.tech/.
 

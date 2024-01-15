@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: postgresql
+    active: mysql
 
 # uncomment below logging details so that you can see each step of the debug process while the application is getting executed
 
